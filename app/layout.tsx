@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { LiquidBorderProvider } from "@/components/LiquidBorder/liquid-border-provider";
-import { LiquidBorder } from "@/components/LiquidBorder/liquid-border";
-import { Welcome } from "@/components/welcome";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 

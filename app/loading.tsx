@@ -1,7 +1,4 @@
 "use client";
-import { StaggeredText } from "@/components/ui/staggered-text";
-
-
 
 export default function Loading() {
   return (

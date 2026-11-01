@@ -7,6 +7,7 @@ import { cacheTags } from "@/lib/cache-tags"
 import { readDate, readString } from "@/lib/entities/document"
 import type { EntityReader } from "@/lib/entities/repository"
 import { EntityValidationError } from "@/lib/entities/errors"
+import { requireSafeHref } from "@/lib/entities/url"
 import { db } from "@/lib/firebase/firebase"
 
 const MENU_COLLECTION = "menus"
@@ -59,12 +60,7 @@ function requireText(value: unknown, fieldName: string) {
 
 function requireHref(value: unknown) {
   const href = requireText(value, "Endereço")
-
-  if (!href.startsWith("/") && !URL.canParse(href)) {
-    throw new EntityValidationError(`Endereço inválido: ${href}`)
-  }
-
-  return href
+  return requireSafeHref(href)
 }
 
 function parseDropdownLink(value: unknown): MenuDropdownLink {

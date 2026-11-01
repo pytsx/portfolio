@@ -4,7 +4,9 @@ import { cacheLife, cacheTag } from "next/cache"
 import {
   collection,
   getDocs,
+  query,
   type DocumentData,
+  where,
 } from "firebase/firestore"
 
 import type { EditorDocument } from "@/components/editor/editor-types"
@@ -66,10 +68,10 @@ async function listAllPublicPages(): Promise<ContentPage[]> {
   cacheLife("hours")
   cacheTag(cacheTags.pages)
 
-  const snapshot = await getDocs(collection(db, PAGES_COLLECTION))
-  return snapshot.docs
-    .filter((document) => document.data().visibility !== "private")
-    .map((document) => pageFromDocument(document.id, document.data()))
+  const snapshot = await getDocs(
+    query(collection(db, PAGES_COLLECTION), where("visibility", "==", "public")),
+  )
+  return snapshot.docs.map((document) => pageFromDocument(document.id, document.data()))
 }
 
 async function getPublicPage(slug: string, groupSlug?: string): Promise<ContentPage | null> {

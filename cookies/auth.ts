@@ -1,5 +1,3 @@
-"use server"
-
 import { cookies } from "next/headers"
 
 import { SESSION_COOKIE_NAME, SESSION_DURATION_IN_SECONDS } from "@/lib/auth/session"

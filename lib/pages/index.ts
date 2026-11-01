@@ -62,7 +62,7 @@ export function pageFromDocument(
 }
 
 async function listAllPublicPages(): Promise<ContentPage[]> {
-  "use cache"
+  "use cache: remote"
   cacheLife("hours")
   cacheTag(cacheTags.pages)
 

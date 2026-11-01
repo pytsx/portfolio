@@ -128,7 +128,7 @@ export function menuFromDocument(id: string, data: DocumentData): Menu {
 }
 
 async function listEnabledMenus() {
-  "use cache"
+  "use cache: remote"
   cacheLife("hours")
   cacheTag(cacheTags.menus)
 

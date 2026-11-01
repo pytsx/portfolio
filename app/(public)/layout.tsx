@@ -3,7 +3,6 @@ import { Welcome } from "./_src/welcome";
 import type { Metadata } from "next";
 import { Menu } from "./_src/menu";
 import { menus } from "@/lib/menu";
-import { connection } from "next/server";
 import { Separator } from "@/components/ui/separator";
 import { Footer } from "./_src/footer";
 import { Suspense } from "react";
@@ -16,7 +15,6 @@ export const metadata: Metadata = {
 };
 
 async function getPublicLayoutData() {
-  await connection()
   const [[menu], settings] = await Promise.all([menus.list(), publicSiteSettings.get()])
   return { menu: menu?.items ?? [], settings }
 }
@@ -34,7 +32,6 @@ async function PublicNavigation() {
 }
 
 async function PublicFooter() {
-  await connection()
   const [socials, settings] = await Promise.all([publicSocials.list(), publicSiteSettings.get()])
 
   return <Footer logo={<div>{settings.logo || settings.name}</div>} socials={socials} />
@@ -59,7 +56,6 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
 }
 
 async function PublicWelcome() {
-  await connection()
   const settings = await publicSiteSettings.get()
   return <Welcome name={settings.name} />
 }

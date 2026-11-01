@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation"
-import { connection } from "next/server"
 import { Suspense } from "react"
 
 import { BlockPage } from "@/components/block-page"
@@ -7,7 +6,6 @@ import { publicPages } from "@/lib/pages"
 import { resolvePageCollections } from "@/lib/pages/render"
 
 async function HomeContent() {
-  await connection()
   const page = await publicPages.getMain()
 
   if (!page) notFound()

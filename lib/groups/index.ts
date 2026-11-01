@@ -38,7 +38,7 @@ export function groupFromDocument(id: string, data: DocumentData): PageGroup {
 }
 
 async function listPublicGroups(): Promise<PageGroup[]> {
-  "use cache"
+  "use cache: remote"
   cacheLife("hours")
   cacheTag(cacheTags.groups)
 

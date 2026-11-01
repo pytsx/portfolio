@@ -22,7 +22,7 @@ const SETTINGS_COLLECTION = "site-settings"
 const SETTINGS_DOCUMENT = "portfolio"
 
 async function getSiteSettings(): Promise<SiteSettings> {
-  "use cache"
+  "use cache: remote"
   cacheLife("hours")
   cacheTag(cacheTags.siteSettings)
 

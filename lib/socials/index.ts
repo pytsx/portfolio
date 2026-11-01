@@ -32,7 +32,7 @@ export function socialFromDocument(id: string, data: DocumentData): SocialLink {
 }
 
 async function listVisibleSocials(): Promise<SocialLink[]> {
-  "use cache"
+  "use cache: remote"
   cacheLife("hours")
   cacheTag(cacheTags.socials)
 

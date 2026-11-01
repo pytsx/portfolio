@@ -2,6 +2,14 @@
 
 import Link from "next/link"
 
+import {
+  CallToActionSection,
+  FeatureGridSection,
+  HeroSection,
+  type CallToActionSectionProps,
+  type FeatureGridSectionProps,
+  type HeroSectionProps,
+} from "@/components/editor/components/web-page-sections"
 import type { EditorDocument } from "@/components/editor/editor-types"
 import "./editor/editor.css"
 
@@ -123,6 +131,43 @@ function YouTubeBlock({ props }: { props: Record<string, unknown> }) {
   )
 }
 
+function asHeroProps(props: Record<string, unknown>): HeroSectionProps {
+  return {
+    eyebrow: typeof props.eyebrow === "string" ? props.eyebrow : "",
+    title: typeof props.title === "string" ? props.title : "",
+    description: typeof props.description === "string" ? props.description : "",
+    primaryLabel: typeof props.primaryLabel === "string" ? props.primaryLabel : "",
+    primaryHref: typeof props.primaryHref === "string" ? getSafeHref(props.primaryHref) ?? "#" : "#",
+    secondaryLabel: typeof props.secondaryLabel === "string" ? props.secondaryLabel : "",
+    secondaryHref: typeof props.secondaryHref === "string" ? getSafeHref(props.secondaryHref) ?? "#" : "#",
+    alignment: props.alignment === "center" ? "center" : "left",
+    appearance: props.appearance === "gradient" ? "gradient" : props.appearance === "muted" ? "muted" : "default",
+  }
+}
+
+function asFeatureGridProps(props: Record<string, unknown>): FeatureGridSectionProps {
+  return {
+    title: typeof props.title === "string" ? props.title : "",
+    description: typeof props.description === "string" ? props.description : "",
+    firstTitle: typeof props.firstTitle === "string" ? props.firstTitle : "",
+    firstDescription: typeof props.firstDescription === "string" ? props.firstDescription : "",
+    secondTitle: typeof props.secondTitle === "string" ? props.secondTitle : "",
+    secondDescription: typeof props.secondDescription === "string" ? props.secondDescription : "",
+    thirdTitle: typeof props.thirdTitle === "string" ? props.thirdTitle : "",
+    thirdDescription: typeof props.thirdDescription === "string" ? props.thirdDescription : "",
+  }
+}
+
+function asCallToActionProps(props: Record<string, unknown>): CallToActionSectionProps {
+  return {
+    title: typeof props.title === "string" ? props.title : "",
+    description: typeof props.description === "string" ? props.description : "",
+    label: typeof props.label === "string" ? props.label : "",
+    href: typeof props.href === "string" ? getSafeHref(props.href) ?? "#" : "#",
+    appearance: props.appearance === "gradient" ? "gradient" : props.appearance === "inverted" ? "inverted" : "default",
+  }
+}
+
 function Block({ block: sourceBlock }: { block: EditorDocument[number] }) {
   const block = asRenderableBlock(sourceBlock)
   const props = block.props ?? {}
@@ -160,6 +205,12 @@ function Block({ block: sourceBlock }: { block: EditorDocument[number] }) {
       return <aside className="editor-callout" data-tone={typeof props.tone === "string" ? props.tone : "info"} role="note"><span className="editor-callout-icon">{typeof props.icon === "string" ? props.icon : "💡"}</span><div><InlineText content={block.content} /></div></aside>
     case "youtube":
       return <YouTubeBlock props={props} />
+    case "hero":
+      return <HeroSection {...asHeroProps(props)} />
+    case "featureGrid":
+      return <FeatureGridSection {...asFeatureGridProps(props)} />
+    case "callToAction":
+      return <CallToActionSection {...asCallToActionProps(props)} />
     case "toggleListItem":
       return <details><summary>{content}</summary><BlockChildren>{block.children}</BlockChildren></details>
     default:

@@ -18,6 +18,9 @@ const IMPORTABLE_BLOCK_TYPES = [
   "callout",
   "youtube",
   "pageCollection",
+  "hero",
+  "featureGrid",
+  "callToAction",
 ] as const
 
 export const editorDocumentJsonSchema = {
@@ -33,7 +36,7 @@ export const editorDocumentJsonSchema = {
       type: { enum: IMPORTABLE_BLOCK_TYPES },
       props: {
         type: "object",
-        description: "Propriedades do bloco. heading usa level (1 a 3); callout usa icon e tone; youtube usa url e caption; pageCollection usa groupId, query, limit, layout, displayMode, visibility e homeOnly.",
+        description: "Propriedades do bloco. heading usa level (1 a 3); callout usa icon e tone; youtube usa url e caption; pageCollection usa groupId, query, limit, layout, displayMode, visibility e homeOnly; hero, featureGrid e callToAction compõem seções web.",
       },
       content: {
         description: "Texto rico em array, por exemplo [{ type: 'text', text: 'Olá', styles: { bold: true } }]. Blocos youtube, divider e pageCollection não usam conteúdo.",

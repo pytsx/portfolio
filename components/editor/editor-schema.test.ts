@@ -21,6 +21,9 @@ describe("editor schema", () => {
         "video",
         "youtube",
         "pageCollection",
+        "hero",
+        "featureGrid",
+        "callToAction",
       ]),
     )
   })

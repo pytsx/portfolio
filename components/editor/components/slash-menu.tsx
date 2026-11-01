@@ -6,7 +6,7 @@ import {
   getDefaultReactSlashMenuItems,
   SuggestionMenuController,
 } from "@blocknote/react"
-import { FileStack, FileVideoCamera, Lightbulb } from "lucide-react"
+import { FileStack, FileVideoCamera, LayoutPanelTop, Lightbulb, PanelsTopLeft, Send } from "lucide-react"
 
 import type { editorSchema } from "../editor-schema"
 
@@ -20,6 +20,30 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
         filterSuggestionItems(
           [
             ...getDefaultReactSlashMenuItems(editor),
+            {
+              title: "Hero",
+              subtext: "Crie a abertura de uma página web",
+              aliases: ["hero", "capa", "abertura", "landing"],
+              group: "Página web",
+              icon: <LayoutPanelTop className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "hero" }),
+            },
+            {
+              title: "Grade de destaques",
+              subtext: "Apresente três diferenciais em cartões",
+              aliases: ["destaques", "features", "cards", "grade"],
+              group: "Página web",
+              icon: <PanelsTopLeft className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "featureGrid" }),
+            },
+            {
+              title: "Chamada para ação",
+              subtext: "Direcione a pessoa para o próximo passo",
+              aliases: ["cta", "ação", "botão", "contato"],
+              group: "Página web",
+              icon: <Send className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "callToAction" }),
+            },
             {
               title: "Callout",
               subtext: "Destaque uma informação importante",

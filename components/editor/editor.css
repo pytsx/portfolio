@@ -27,6 +27,18 @@
   overflow-x: auto;
 }
 
+.portfolio-block {
+  color: var(--foreground);
+}
+
+.portfolio-block .bn-block-outer {
+  margin: 0;
+}
+
+.portfolio-block .bn-block-content {
+  min-height: 0;
+}
+
 .editor-callout {
   display: flex;
   gap: 0.75rem;

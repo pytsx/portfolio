@@ -61,5 +61,21 @@ export const youtubeBlock = createReactBlockSpec(
         </figure>
       )
     },
+    toExternalHTML: ({ block }) => {
+      const videoId = getYouTubeVideoId(block.props.url)
+      if (!videoId) return <p>{block.props.url}</p>
+
+      return (
+        <figure className="editor-youtube">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+            title={block.props.caption || "Vídeo do YouTube"}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+          {block.props.caption ? <figcaption>{block.props.caption}</figcaption> : null}
+        </figure>
+      )
+    },
   },
 )()

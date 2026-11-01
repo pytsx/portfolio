@@ -1,11 +1,13 @@
 import "server-only"
 
 import { createSlug } from "@/lib/entities/document"
-import { EntityValidationError } from "@/lib/entities/errors"
+import { EntityUnauthorizedError, EntityValidationError } from "@/lib/entities/errors"
 import { createAuthenticatedRepository } from "@/lib/firebase/authenticated-repository"
+import { getAuthenticatedContext } from "@/lib/auth/server"
 import { groupFromDocument, type GroupInput, type PageGroup } from "@/lib/groups"
 import { getEditorDocumentText } from "@/components/editor/lib/document"
 import { clearOtherHomeDocuments } from "@/lib/entities/home"
+import { collection, getDocs, writeBatch } from "firebase/firestore"
 
 function validateGroup(input: GroupInput): GroupInput {
   const title = input.title.trim()
@@ -57,5 +59,26 @@ export const groupRepository = {
     })
     if (updatedGroup.isHome) await clearOtherHomeDocuments("groups", id)
     return updatedGroup
+  },
+  async migrateLegacyVisibility() {
+    const context = await getAuthenticatedContext()
+    if (!context) {
+      throw new EntityUnauthorizedError("Sua sessão expirou. Entre novamente.")
+    }
+
+    const snapshot = await getDocs(collection(context.db, "groups"))
+    const legacyDocuments = snapshot.docs.filter(
+      (document) => typeof document.data().visibility !== "string",
+    )
+
+    for (let index = 0; index < legacyDocuments.length; index += 500) {
+      const batch = writeBatch(context.db)
+      legacyDocuments
+        .slice(index, index + 500)
+        .forEach((document) => batch.update(document.ref, { visibility: "public" }))
+      await batch.commit()
+    }
+
+    return legacyDocuments.length
   },
 }

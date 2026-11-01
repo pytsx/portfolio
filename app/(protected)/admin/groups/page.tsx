@@ -1,7 +1,7 @@
 import { AdminEntityList } from "@/app/(protected)/admin/_src/entity-list"
 import { AdminPageHeader } from "@/app/(protected)/admin/_src/page-header"
 import { groupRepository } from "@/lib/groups/server"
-import { deleteGroup } from "./actions"
+import { deleteGroup, migrateLegacyGroups } from "./actions"
 import { Suspense } from "react"
 import { connection } from "next/server"
 import { AdminPageFallback } from "../_src/admin-page-fallback"
@@ -10,6 +10,7 @@ import { GroupComposer } from "./_src/group-composer"
 import { createGroup } from "./actions"
 import { pageRepository } from "@/lib/pages/server"
 import { createEditorCollectionData } from "@/lib/pages/editor-collections"
+import { Button } from "@/components/ui/button"
 
 async function GroupsContent({
   searchParams,
@@ -28,6 +29,11 @@ async function GroupsContent({
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-8">
       <AdminPageHeader title="Grupos" description="Organize páginas em coleções e rotas." createHref="/admin/groups?new=1" createLabel="Novo grupo" />
+      <form action={migrateLegacyGroups} className="-mt-4 mb-6">
+        <Button type="submit" variant="outline" size="sm">
+          Migrar grupos antigos para público
+        </Button>
+      </form>
       <AdminEntityList
         items={groups.map((group) => ({
           id: group.id,

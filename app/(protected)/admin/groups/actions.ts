@@ -63,3 +63,8 @@ export async function deleteGroup(formData: FormData) {
   revalidateGroups()
   redirect("/admin/groups")
 }
+
+export async function migrateLegacyGroups() {
+  await groupRepository.migrateLegacyVisibility()
+  revalidateGroups()
+}

@@ -1,15 +1,17 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { syntaxHighlighter } from "@blocknote/code-block"
 import { pt } from "@blocknote/core/locales"
 import { useCreateBlockNote } from "@blocknote/react"
 import { BlockNoteView } from "@blocknote/shadcn"
 import { useTheme } from "next-themes"
+import { Monitor, Smartphone, Tablet } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { EditorSlashMenu } from "./components/slash-menu"
 import { PageCollectionProvider } from "./components/page-collection-context"
+import { BlockInspector } from "./components/block-inspector"
 import { editorSchema } from "./editor-schema"
 import type { EditorDocument, EditorProps } from "./editor-types"
 import { areEditorDocumentsEqual, normalizeEditorDocument } from "./lib/document"
@@ -19,6 +21,9 @@ import "@blocknote/shadcn/style.css"
 import "./editor.css"
 
 const DEFAULT_PLACEHOLDER = "Comece a escrever..."
+type EditorInstance = typeof editorSchema.BlockNoteEditor
+type SelectedBlock = ReturnType<EditorInstance["getBlock"]>
+type BuilderViewport = "desktop" | "tablet" | "mobile"
 
 export function EditorClient({
   value,
@@ -32,6 +37,7 @@ export function EditorClient({
   onUpload,
   onError,
   collections,
+  mode = "document",
 }: EditorProps) {
   const { resolvedTheme } = useTheme()
   const onChangeRef = useRef(onChange)
@@ -39,6 +45,8 @@ export function EditorClient({
   const onErrorRef = useRef(onError)
   const lastEmittedDocumentRef = useRef<EditorDocument | undefined>(undefined)
   const appliesExternalDocumentRef = useRef(false)
+  const [selectedBlock, setSelectedBlock] = useState<SelectedBlock>()
+  const [viewport, setViewport] = useState<BuilderViewport>("desktop")
 
   useEffect(() => {
     onChangeRef.current = onChange
@@ -91,26 +99,59 @@ export function EditorClient({
     })
   }, [editor, value])
 
+  function updateSelectedBlock() {
+    const selectionBlock = editor.getSelection()?.blocks[0]
+    if (selectionBlock) {
+      setSelectedBlock(editor.getBlock(selectionBlock.id))
+      return
+    }
+
+    try {
+      setSelectedBlock(editor.getBlock(editor.getTextCursorPosition().block.id))
+    } catch {
+      setSelectedBlock(undefined)
+    }
+  }
+
   return (
     <PageCollectionProvider collections={collections}>
-      <BlockNoteView
-        editor={editor}
-        theme={resolvedTheme === "dark" ? "dark" : "light"}
-        editable={editable}
-        slashMenu={false}
-        className={cn("portfolio-editor", className)}
-        data-readonly={!editable}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onChange={() => {
-          if (!editable || appliesExternalDocumentRef.current) return
-          const document = editor.document as EditorDocument
-          lastEmittedDocumentRef.current = document
-          onChangeRef.current(document)
-        }}
-      >
-        {editable ? <EditorSlashMenu editor={editor} /> : null}
-      </BlockNoteView>
+      <div className="editor-workspace" data-mode={mode}>
+        <div className="editor-canvas-column">
+          {mode === "builder" ? (
+            <div className="editor-viewport-toolbar" aria-label="Largura da prévia">
+              {(["desktop", "tablet", "mobile"] as const).map((option) => (
+                <button key={option} type="button" aria-pressed={viewport === option} onClick={() => setViewport(option)}>
+                  {option === "desktop" ? <Monitor /> : option === "tablet" ? <Tablet /> : <Smartphone />}
+                  <span className="sr-only">{option}</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          <div className="editor-canvas" data-viewport={viewport}>
+            <BlockNoteView
+              editor={editor}
+              theme={resolvedTheme === "dark" ? "dark" : "light"}
+              editable={editable}
+              slashMenu={false}
+              className={cn("portfolio-editor", className)}
+              data-readonly={!editable}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              onSelectionChange={updateSelectedBlock}
+              onChange={() => {
+                if (!editable || appliesExternalDocumentRef.current) return
+                const document = editor.document as EditorDocument
+                lastEmittedDocumentRef.current = document
+                onChangeRef.current(document)
+                updateSelectedBlock()
+              }}
+            >
+              {editable ? <EditorSlashMenu editor={editor} /> : null}
+            </BlockNoteView>
+          </div>
+        </div>
+        {mode === "builder" && editable ? <BlockInspector block={selectedBlock} editor={editor} /> : null}
+      </div>
     </PageCollectionProvider>
   )
 }

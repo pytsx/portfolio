@@ -80,8 +80,9 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
         </Button>
       </header>
 
-      <main className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-12 sm:py-20">
-        <input
+      <main className="w-full py-10 sm:py-14">
+        <div className="mx-auto w-full max-w-4xl px-5 sm:px-12">
+          <input
           name="title"
           defaultValue={page?.title}
           placeholder="Sem título"
@@ -90,7 +91,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           required
           className="mb-3 w-full bg-transparent text-4xl font-bold tracking-tight outline-none placeholder:text-muted-foreground/50 sm:text-6xl"
         />
-        <div className="mb-10 flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="mb-10 flex items-center gap-2 text-sm text-muted-foreground">
           <select
             name="groupId"
             defaultValue={page?.groupId ?? defaultGroupId ?? ""}
@@ -113,19 +114,17 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
             readOnly={Boolean(page)}
             className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground/60"
           />
-        </div>
+          </div>
 
-        {state.error ? (
-          <p role="alert" className="mb-6 text-sm text-destructive">
-            {state.error}
-          </p>
-        ) : null}
+          {state.error ? <p role="alert" className="mb-6 text-sm text-destructive">{state.error}</p> : null}
+        </div>
 
         <Editor
           value={content}
           onChange={setContent}
           placeholder="Digite / para escolher um bloco"
           autoFocus={Boolean(page)}
+          mode="builder"
         />
       </main>
     </form>

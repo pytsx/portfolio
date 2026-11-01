@@ -24,6 +24,9 @@ describe("editor schema", () => {
         "hero",
         "featureGrid",
         "callToAction",
+        "section",
+        "columns",
+        "column",
       ]),
     )
   })

@@ -10,6 +10,13 @@ import {
   type FeatureGridSectionProps,
   type HeroSectionProps,
 } from "@/components/editor/components/web-page-sections"
+import {
+  PageColumn,
+  PageColumns,
+  PageSection,
+  type PageColumnsProperties,
+  type PageSectionProperties,
+} from "@/components/editor/components/page-layouts"
 import type { EditorDocument } from "@/components/editor/editor-types"
 import "./editor/editor.css"
 
@@ -23,7 +30,7 @@ export type BlockCollectionItem = {
 
 type BlockRendererProps = {
   content: EditorDocument
-  collections?: Record<number, BlockCollectionItem[]>
+  collections?: Record<string, BlockCollectionItem[]>
 }
 
 type RenderableBlock = {
@@ -94,9 +101,13 @@ function InlineText({ content }: { content: unknown }) {
   )
 }
 
-function BlockChildren({ children }: { children?: EditorDocument }) {
+function getBlockKey(block: EditorDocument[number], path: string) {
+  return block.id ?? path
+}
+
+function BlockChildren({ children, collections, path }: { children?: EditorDocument; collections: Record<string, BlockCollectionItem[]>; path: string }) {
   if (!children?.length) return null
-  return <div className="portfolio-block-children">{children.map((child) => <Block key={child.id ?? child.type} block={child} />)}</div>
+  return <div className="portfolio-block-children">{children.map((child, index) => <Block key={getBlockKey(child, `${path}.${index}`)} block={child} collections={collections} path={`${path}.${index}`} />)}</div>
 }
 
 function YouTubeBlock({ props }: { props: Record<string, unknown> }) {
@@ -168,10 +179,30 @@ function asCallToActionProps(props: Record<string, unknown>): CallToActionSectio
   }
 }
 
-function Block({ block: sourceBlock }: { block: EditorDocument[number] }) {
+function asSectionProperties(props: Record<string, unknown>): PageSectionProperties {
+  return {
+    width: props.width === "narrow" || props.width === "standard" || props.width === "full" ? props.width : "wide",
+    surface: props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : "transparent",
+    spacing: props.spacing === "sm" || props.spacing === "md" || props.spacing === "xl" ? props.spacing : "lg",
+    radius: props.radius === "md" || props.radius === "lg" ? props.radius : "none",
+    anchor: typeof props.anchor === "string" ? props.anchor : "",
+    effect: props.effect === "fade" || props.effect === "slide" ? props.effect : "none",
+  }
+}
+
+function asColumnsProperties(props: Record<string, unknown>): PageColumnsProperties {
+  return {
+    distribution: props.distribution === "sidebar-left" || props.distribution === "sidebar-right" ? props.distribution : "equal",
+    gap: props.gap === "sm" || props.gap === "lg" ? props.gap : "md",
+    mobile: props.mobile === "scroll" ? "scroll" : "stack",
+  }
+}
+
+function Block({ block: sourceBlock, collections, path }: { block: EditorDocument[number]; collections: Record<string, BlockCollectionItem[]>; path: string }) {
   const block = asRenderableBlock(sourceBlock)
   const props = block.props ?? {}
   const content = <InlineText content={block.content} />
+  const blockKey = getBlockKey(sourceBlock, path)
 
   switch (block.type) {
     case "heading": {
@@ -180,13 +211,13 @@ function Block({ block: sourceBlock }: { block: EditorDocument[number] }) {
       return <Heading><span>{content}</span></Heading>
     }
     case "bulletListItem":
-      return <ul><li><span>{content}</span><BlockChildren>{block.children}</BlockChildren></li></ul>
+      return <ul><li><span>{content}</span><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></li></ul>
     case "numberedListItem":
-      return <ol><li><span>{content}</span><BlockChildren>{block.children}</BlockChildren></li></ol>
+      return <ol><li><span>{content}</span><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></li></ol>
     case "checkListItem":
       return <div className="portfolio-check-list-item"><input type="checkbox" checked={props.checked === true} readOnly /><span>{content}</span></div>
     case "quote":
-      return <blockquote>{content}<BlockChildren>{block.children}</BlockChildren></blockquote>
+      return <blockquote>{content}<BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></blockquote>
     case "codeBlock":
       return <pre><code>{typeof props.code === "string" ? props.code : ""}</code></pre>
     case "divider":
@@ -212,9 +243,17 @@ function Block({ block: sourceBlock }: { block: EditorDocument[number] }) {
     case "callToAction":
       return <CallToActionSection {...asCallToActionProps(props)} />
     case "toggleListItem":
-      return <details><summary>{content}</summary><BlockChildren>{block.children}</BlockChildren></details>
+      return <details><summary>{content}</summary><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></details>
+    case "section":
+      return <PageSection properties={asSectionProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageSection>
+    case "columns":
+      return <PageColumns properties={asColumnsProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumns>
+    case "column":
+      return <PageColumn><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumn>
+    case "pageCollection":
+      return <PageCollection items={collections[blockKey] ?? []} layout={props.layout === "list" ? "list" : "grid"} />
     default:
-      return <div>{content}<BlockChildren>{block.children}</BlockChildren></div>
+      return <div>{content}<BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></div>
   }
 }
 
@@ -246,9 +285,10 @@ export async function BlockRenderer({
 }: BlockRendererProps) {
   return (
     <div className="portfolio-block-renderer space-y-6">
-      {content.map((sourceBlock, index) => sourceBlock.type === "pageCollection"
-        ? <PageCollection key={sourceBlock.id ?? `collection-${index}`} items={collections[index] ?? []} layout={sourceBlock.props?.layout === "list" ? "list" : "grid"} />
-        : <div key={sourceBlock.id ?? `block-${index}`} className="portfolio-block"><Block block={sourceBlock} /></div>)}
+      {content.map((sourceBlock, index) => {
+        const path = String(index)
+        return <div key={getBlockKey(sourceBlock, path)} className="portfolio-block" data-block-type={sourceBlock.type}><Block block={sourceBlock} collections={collections} path={path} /></div>
+      })}
     </div>
   )
 }

@@ -6,7 +6,7 @@ import {
   getDefaultReactSlashMenuItems,
   SuggestionMenuController,
 } from "@blocknote/react"
-import { FileStack, FileVideoCamera, LayoutPanelTop, Lightbulb, PanelsTopLeft, Send } from "lucide-react"
+import { Columns3, FileStack, FileVideoCamera, LayoutPanelTop, Lightbulb, PanelsTopLeft, Send, SquareDashed } from "lucide-react"
 
 import type { editorSchema } from "../editor-schema"
 
@@ -20,6 +20,46 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
         filterSuggestionItems(
           [
             ...getDefaultReactSlashMenuItems(editor),
+            {
+              title: "Seção",
+              subtext: "Agrupe blocos com largura, fundo e espaçamento",
+              aliases: ["seção", "section", "container", "layout"],
+              group: "Estrutura",
+              icon: <SquareDashed className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, {
+                type: "section",
+                children: [{ type: "paragraph" }],
+              }),
+            },
+            {
+              title: "Duas colunas",
+              subtext: "Organize blocos lado a lado",
+              aliases: ["colunas", "columns", "grid", "duas"],
+              group: "Estrutura",
+              icon: <Columns3 className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, {
+                type: "columns",
+                children: [
+                  { type: "column", children: [{ type: "paragraph" }] },
+                  { type: "column", children: [{ type: "paragraph" }] },
+                ],
+              }),
+            },
+            {
+              title: "Três colunas",
+              subtext: "Crie uma grade responsiva de três áreas",
+              aliases: ["colunas", "columns", "grid", "três"],
+              group: "Estrutura",
+              icon: <Columns3 className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, {
+                type: "columns",
+                children: [
+                  { type: "column", children: [{ type: "paragraph" }] },
+                  { type: "column", children: [{ type: "paragraph" }] },
+                  { type: "column", children: [{ type: "paragraph" }] },
+                ],
+              }),
+            },
             {
               title: "Hero",
               subtext: "Crie a abertura de uma página web",

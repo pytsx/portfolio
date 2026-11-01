@@ -34,4 +34,5 @@ export interface EditorProps {
   onUpload?: (file: File) => Promise<string>
   onError?: (error: Error) => void
   collections?: EditorCollectionData
+  mode?: "document" | "builder"
 }

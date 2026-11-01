@@ -56,6 +56,22 @@ describe("editor document", () => {
     )
   })
 
+  it("extracts semantic content from visual-only blocks", () => {
+    const document: EditorDocument = [
+      {
+        type: "hero",
+        props: {
+          eyebrow: "Portfólio",
+          title: "Produtos digitais",
+          description: "Experiências rápidas e acessíveis.",
+        },
+      },
+    ]
+
+    expect(getEditorDocumentText(document)).toContain("Produtos digitais")
+    expect(getEditorDocumentText(document)).toContain("Experiências rápidas")
+  })
+
   it("compares cloned documents without serializing on every keystroke", () => {
     const clonedDocument = structuredClone(existingDocument)
 

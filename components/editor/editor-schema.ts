@@ -9,6 +9,7 @@ import { calloutBlock } from "./blocks/callout-block"
 import { youtubeBlock } from "./blocks/youtube-block"
 import { pageCollectionBlock } from "./blocks/page-collection-block"
 import { callToActionBlock, featureGridBlock, heroBlock } from "./blocks/web-page-blocks"
+import { columnBlock, columnsBlock, sectionBlock } from "./blocks/layout-blocks"
 
 export const editorSchema = BlockNoteSchema.create({
   blockSpecs: {
@@ -20,5 +21,8 @@ export const editorSchema = BlockNoteSchema.create({
     hero: heroBlock,
     featureGrid: featureGridBlock,
     callToAction: callToActionBlock,
+    section: sectionBlock,
+    columns: columnsBlock,
+    column: columnBlock,
   },
 })

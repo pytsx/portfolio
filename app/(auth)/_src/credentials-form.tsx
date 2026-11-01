@@ -8,7 +8,6 @@ import {
   EyeOff,
   LoaderCircle,
   LockKeyhole,
-  ShieldCheck,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"

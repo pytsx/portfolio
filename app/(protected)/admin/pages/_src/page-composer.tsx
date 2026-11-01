@@ -13,6 +13,7 @@ import type { ContentPage } from "@/lib/pages"
 import type { PageGroup } from "@/lib/groups"
 import { getGroupDepth } from "@/lib/groups/tree"
 import { HomePageButton } from "./home-page-button"
+import { PageActions } from "./page-actions"
 
 type PageMutation = (
   state: MutationState,
@@ -64,6 +65,11 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
             setIsHome(nextIsHome)
             if (nextIsHome) setVisibility("public")
           }}
+        />
+        <PageActions
+          content={content}
+          fileName={page?.slug ?? "nova-pagina"}
+          onImport={setContent}
         />
         <Button type="submit" size="sm" disabled={pending}>
           <Save data-icon="inline-start" />

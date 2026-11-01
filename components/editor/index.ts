@@ -12,3 +12,8 @@ export {
   getEditorDocumentText,
   parseEditorDocument,
 } from "./lib/document"
+export {
+  createEditorDocumentExport,
+  editorDocumentJsonSchema,
+  parseImportedEditorDocument,
+} from "./lib/transfer"

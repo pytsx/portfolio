@@ -1,7 +1,7 @@
 import "server-only"
 
 import { cacheLife, cacheTag } from "next/cache"
-import { collection, getDocs, query, type DocumentData, where } from "firebase/firestore"
+import { collection, getDocs, type DocumentData } from "firebase/firestore"
 
 import { cacheTags } from "@/lib/cache-tags"
 import type { EditorDocument } from "@/components/editor/editor-types"
@@ -49,10 +49,10 @@ async function listPublicGroups(): Promise<PageGroup[]> {
   cacheLife("hours")
   cacheTag(cacheTags.groups)
 
-  const snapshot = await getDocs(
-    query(collection(db, GROUPS_COLLECTION), where("visibility", "==", "public")),
-  )
-  return snapshot.docs.map((document) => groupFromDocument(document.id, document.data()))
+  const snapshot = await getDocs(collection(db, GROUPS_COLLECTION))
+  return snapshot.docs
+    .filter((document) => document.data().visibility !== "private")
+    .map((document) => groupFromDocument(document.id, document.data()))
 }
 
 async function getPublicGroup(slug: string): Promise<PageGroup | null> {

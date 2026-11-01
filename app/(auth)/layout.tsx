@@ -83,11 +83,11 @@ export default function AuthLayout({
 
             <div className="flex flex-col gap-0.5">
               <span className="text-[13px] font-semibold leading-4 tracking-tight">
-                Administração
+                Admin
               </span>
 
               <span className="text-[10px] leading-3 text-muted-foreground">
-                Portfolio workspace
+                Área Restrita
               </span>
             </div>
           </Link>
@@ -184,17 +184,7 @@ export default function AuthLayout({
             sm:flex-row sm:px-10
           "
         >
-          <span className="text-[11px] text-muted-foreground/55">
-            Portfolio · Administração
-          </span>
-
-          <div className="flex items-center gap-2 text-[11px] text-muted-foreground/55">
-            <span className="size-1 rounded-full bg-foreground/25" />
-
-            <span>
-              Área reservada
-            </span>
-          </div>
+         
         </div>
       </footer>
     </main>

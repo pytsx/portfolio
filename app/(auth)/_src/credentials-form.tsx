@@ -116,7 +116,7 @@ export function CredentialsForm({
               <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
             </span>
 
-            ÁREA ADMINISTRATIVA
+            Login
           </div>
 
           <CardTitle
@@ -314,31 +314,6 @@ export function CredentialsForm({
           )}
         </Button>
 
-        <div className="mt-7 flex w-full items-center gap-3">
-          <div className="h-px flex-1 bg-border/60" />
-
-          <span className="text-[10px] text-muted-foreground/70">
-            ACESSO PROTEGIDO
-          </span>
-
-          <div className="h-px flex-1 bg-border/60" />
-        </div>
-
-        <div className="mt-5 flex items-start gap-2.5">
-          <ShieldCheck
-            className="
-              mt-0.5 size-4 shrink-0
-              text-muted-foreground/60
-            "
-            strokeWidth={1.6}
-            aria-hidden="true"
-          />
-
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Acesso restrito a administradores autorizados.
-            Suas credenciais são utilizadas para autenticação.
-          </p>
-        </div>
       </CardFooter>
     </form>
   )

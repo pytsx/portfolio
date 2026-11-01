@@ -29,7 +29,7 @@ export default function SignInPage() {
   return (
     <CredentialsForm
       title="Bem-vindo de volta"
-      description="Entre para administrar o conteúdo do seu portfólio."
+      description="Acesse com email e senha"
       submitLabel="Entrar"
       submitCredentials={submitSignIn}
     />

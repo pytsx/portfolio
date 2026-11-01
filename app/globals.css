@@ -311,3 +311,10 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+.sidebar-main-page {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(var(--sidebar), var(--sidebar)) padding-box,
+    linear-gradient(120deg, oklch(0.7 0.2 290), oklch(0.72 0.2 340), oklch(0.75 0.16 210)) border-box;
+}

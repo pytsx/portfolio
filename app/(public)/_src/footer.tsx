@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Social } from "./type";
+import type { SocialLink } from "@/lib/socials";
 
 type Props = {
   logo: React.ReactNode
-  socials: Social[]
+  socials: SocialLink[]
 }
 
-export async function Footer({ logo, socials }: Props) {
+export function Footer({ logo, socials }: Props) {
 
   return (
 
@@ -15,13 +15,9 @@ export async function Footer({ logo, socials }: Props) {
           {logo}
 
         <div className="flex items-center gap-6">
-          <Link href="/blog" className="hover:text-foreground">
-            Blog
-          </Link>
-
           {socials.map((social) => (
             <a
-              key={social.name}
+              key={social.id}
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"

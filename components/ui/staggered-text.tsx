@@ -141,14 +141,15 @@ export function StaggeredText({
   const elementRef = React.useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const reduceMotion = respectReducedMotion && !!prefersReducedMotion;
-  const [inView, setInView] = React.useState(trigger === "mount");
+  const [inView, setInView] = React.useState(false);
   const hasBeenVisible = React.useRef(false);
+  const observesViewport =
+    trigger === "inView" &&
+    !reduceMotion &&
+    typeof IntersectionObserver !== "undefined";
 
   React.useEffect(() => {
-    if (trigger === "mount" || reduceMotion || typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
+    if (!observesViewport) return;
 
     const element = elementRef.current;
     if (!element) return;
@@ -166,14 +167,14 @@ export function StaggeredText({
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [trigger, reduceMotion, exitOnScrollOut, threshold, rootMargin]);
+  }, [observesViewport, exitOnScrollOut, threshold, rootMargin]);
 
   const { rows, count } = React.useMemo(
     () => splitText(text, segmentBy, separator),
     [text, segmentBy, separator],
   );
 
-  const isVisible = reduceMotion || inView;
+  const isVisible = !observesViewport || inView;
   React.useEffect(() => {
     if (isVisible) hasBeenVisible.current = true;
   }, [isVisible]);

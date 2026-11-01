@@ -1,8 +1,10 @@
-"use client";
-
 export default function Loading() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div
+      aria-label="Carregando"
+      className="flex min-h-screen items-center justify-center"
+    >
+      <div className="size-8 animate-pulse rounded-full bg-muted" />
     </div>
   );
 }

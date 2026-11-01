@@ -71,7 +71,7 @@ export function HeroSection({
     : appearance === "muted" ? "bg-muted/60" : "border border-border bg-card"
 
   return (
-    <section className={`overflow-hidden rounded-3xl ${background} px-6 py-14 sm:px-12 sm:py-20`}>
+    <section className={`page-web-section overflow-hidden rounded-3xl ${background} px-6 py-14 sm:px-12 sm:py-20`}>
       <div className={`grid gap-6 ${isCentered ? "mx-auto max-w-3xl justify-items-center text-center" : "max-w-3xl"}`}>
         {eyebrow ? <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">{eyebrow}</span> : null}
         <div className="grid gap-4">
@@ -104,7 +104,7 @@ export function FeatureGridSection({
   ]
 
   return (
-    <section className="grid gap-8 py-6">
+    <section className="page-web-section grid gap-8 py-6">
       <div className="grid max-w-2xl gap-3">
         <h2 className="text-3xl font-semibold tracking-tight">{title || "Destaques"}</h2>
         {description ? <p className="leading-7 text-muted-foreground">{description}</p> : null}
@@ -131,7 +131,7 @@ export function CallToActionSection({ title, description, label, href, appearanc
   const mutedText = appearance === "default" ? "text-muted-foreground" : "text-primary-foreground/75"
 
   return (
-    <section className={`grid gap-6 rounded-3xl p-7 sm:grid-cols-[1fr_auto] sm:items-center sm:p-10 ${background}`}>
+    <section className={`page-web-section grid gap-6 rounded-3xl p-7 sm:grid-cols-[1fr_auto] sm:items-center sm:p-10 ${background}`}>
       <div className="grid gap-2">
         <h2 className="text-2xl font-semibold tracking-tight">{title || "Pronto para começar?"}</h2>
         {description ? <p className={mutedText}>{description}</p> : null}

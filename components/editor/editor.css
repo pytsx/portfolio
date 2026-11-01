@@ -179,13 +179,9 @@
   outline-offset: 0.25rem;
 }
 
-.portfolio-block-renderer > .portfolio-block:not([data-block-type="section"]):not([data-block-type="columns"]):not([data-block-type="hero"]):not([data-block-type="featureGrid"]):not([data-block-type="callToAction"]) {
-  width: min(100% - 2.5rem, 48rem);
-  margin-inline: auto;
-}
-
-.portfolio-block-renderer > .portfolio-block:is([data-block-type="hero"], [data-block-type="featureGrid"], [data-block-type="callToAction"]) {
-  width: min(100% - 2.5rem, 80rem);
+.page-web-section {
+  width: 100%;
+  max-width: 80rem;
   margin-inline: auto;
 }
 

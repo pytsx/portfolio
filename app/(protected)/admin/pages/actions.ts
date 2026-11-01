@@ -64,4 +64,5 @@ export async function updatePage(
 export async function deletePage(formData: FormData) {
   await pageRepository.delete(readFormString(formData, "id"))
   revalidatePageRoutes()
+  redirect("/admin/pages")
 }

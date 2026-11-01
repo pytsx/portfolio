@@ -10,6 +10,7 @@ import type { PageGroup } from "@/lib/groups"
 import { getGroupDepth } from "@/lib/groups/tree"
 import { HomePageButton } from "../../pages/_src/home-page-button"
 import { PageActions } from "../../pages/_src/page-actions"
+import { deleteGroup } from "../actions"
 
 type GroupComposerProps = {
   action(state: MutationState, data: FormData): Promise<MutationState>
@@ -50,7 +51,14 @@ export function GroupComposer({ action, group, groups, defaultParentId, collecti
             if (nextIsHome) setVisibility("public")
           }}
         />
-        <PageActions content={content} fileName={group?.slug ?? "novo-grupo"} onImport={setContent} />
+        <PageActions
+          content={content}
+          fileName={group?.slug ?? "novo-grupo"}
+          onImport={setContent}
+          entityId={group?.id}
+          entityLabel="grupo"
+          deleteAction={group ? deleteGroup : undefined}
+        />
         <Button type="submit" size="sm" disabled={pending}>
           <Save data-icon="inline-start" />
           {pending ? "Salvando..." : "Salvar"}

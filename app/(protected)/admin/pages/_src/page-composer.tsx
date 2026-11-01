@@ -14,6 +14,7 @@ import type { PageGroup } from "@/lib/groups"
 import { getGroupDepth } from "@/lib/groups/tree"
 import { HomePageButton } from "./home-page-button"
 import { PageActions } from "./page-actions"
+import { deletePage } from "../actions"
 
 type PageMutation = (
   state: MutationState,
@@ -70,6 +71,8 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           content={content}
           fileName={page?.slug ?? "nova-pagina"}
           onImport={setContent}
+          entityId={page?.id}
+          deleteAction={page ? deletePage : undefined}
         />
         <Button type="submit" size="sm" disabled={pending}>
           <Save data-icon="inline-start" />

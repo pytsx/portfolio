@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { ClipboardCopy, Download, FileUp, MoreHorizontal } from "lucide-react"
+import { ClipboardCopy, Download, FileUp, MoreHorizontal, Trash2 } from "lucide-react"
 
 import type { EditorDocument } from "@/components/editor"
 import {
@@ -15,6 +15,7 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -23,6 +24,9 @@ type PageActionsProps = {
   content: EditorDocument
   fileName: string
   onImport(document: EditorDocument): void
+  entityId?: string
+  entityLabel?: string
+  deleteAction?: (formData: FormData) => Promise<void>
 }
 
 function copyText(text: string) {
@@ -49,7 +53,14 @@ function downloadJson({ content, fileName }: Pick<PageActionsProps, "content" | 
   URL.revokeObjectURL(url)
 }
 
-export function PageActions({ content, fileName, onImport }: PageActionsProps) {
+export function PageActions({
+  content,
+  fileName,
+  onImport,
+  entityId,
+  entityLabel = "página",
+  deleteAction,
+}: PageActionsProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState<string>()
 
@@ -74,6 +85,16 @@ export function PageActions({ content, fileName, onImport }: PageActionsProps) {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Não foi possível importar o arquivo.")
     }
+
+  }
+
+  async function handleDelete() {
+    if (!deleteAction || !entityId) return
+    if (!window.confirm(`Remover esta ${entityLabel}? Esta ação não pode ser desfeita.`)) return
+
+    const formData = new FormData()
+    formData.set("id", entityId)
+    await deleteAction(formData)
   }
 
   return (
@@ -95,6 +116,14 @@ export function PageActions({ content, fileName, onImport }: PageActionsProps) {
             <DropdownMenuItem onClick={() => downloadJson({ content, fileName })}>
               <Download /> Exportar JSON
             </DropdownMenuItem>
+            {deleteAction && entityId ? (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={handleDelete}>
+                  <Trash2 /> Remover {entityLabel}
+                </DropdownMenuItem>
+              </>
+            ) : null}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

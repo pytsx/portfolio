@@ -61,4 +61,5 @@ export async function updateGroup(
 export async function deleteGroup(formData: FormData) {
   await groupRepository.delete(readFormString(formData, "id"))
   revalidateGroups()
+  redirect("/admin/groups")
 }

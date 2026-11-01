@@ -5,6 +5,7 @@ import { syntaxHighlighter } from "@blocknote/code-block"
 import { pt } from "@blocknote/core/locales"
 import { useCreateBlockNote } from "@blocknote/react"
 import { BlockNoteView } from "@blocknote/shadcn"
+import { useTheme } from "next-themes"
 
 import { cn } from "@/lib/utils"
 import { EditorSlashMenu } from "./components/slash-menu"
@@ -32,6 +33,7 @@ export function EditorClient({
   onError,
   collections,
 }: EditorProps) {
+  const { resolvedTheme } = useTheme()
   const onChangeRef = useRef(onChange)
   const onUploadRef = useRef(onUpload)
   const onErrorRef = useRef(onError)
@@ -93,6 +95,7 @@ export function EditorClient({
     <PageCollectionProvider collections={collections}>
       <BlockNoteView
         editor={editor}
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
         editable={editable}
         slashMenu={false}
         className={cn("portfolio-editor", className)}

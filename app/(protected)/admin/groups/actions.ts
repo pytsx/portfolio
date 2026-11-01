@@ -14,14 +14,20 @@ function readGroupForm(formData: FormData) {
     title: readFormString(formData, "title"),
     slug: readFormString(formData, "slug"),
     content: parseEditorDocument(readFormJson(formData, "content")),
+    visibility: readFormString(formData, "visibility") === "private"
+      ? "private" as const
+      : "public" as const,
+    isHome: formData.get("isHome") === "on",
     parentId: readFormString(formData, "parentId") || undefined,
   }
 }
 
 function revalidateGroups(slug?: string) {
   updateTag(cacheTags.groups)
+  updateTag(cacheTags.pages)
   revalidatePath("/admin/groups")
   revalidatePath("/admin", "layout")
+  revalidatePath("/")
   if (slug) revalidatePath(`/${slug}`)
 }
 

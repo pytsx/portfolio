@@ -4,8 +4,7 @@ import { getEditorDocumentText } from "@/components/editor/lib/document"
 import { createSlug } from "@/lib/entities/document"
 import { EntityValidationError } from "@/lib/entities/errors"
 import { createAuthenticatedRepository } from "@/lib/firebase/authenticated-repository"
-import { getAuthenticatedContext } from "@/lib/auth/server"
-import { collection, getDocs, query, where, writeBatch } from "firebase/firestore"
+import { clearOtherHomeDocuments } from "@/lib/entities/home"
 import {
   pageFromDocument,
   type ContentPage,
@@ -61,21 +60,7 @@ const basePageRepository = createAuthenticatedRepository<
 })
 
 async function clearOtherHomePages(pageId: string) {
-  const context = await getAuthenticatedContext()
-  if (!context) return
-
-  const pagesQuery = query(
-    collection(context.db, PAGES_COLLECTION),
-    where("isHome", "==", true),
-  )
-
-  const pages = await getDocs(pagesQuery)
-  const batch = writeBatch(context.db)
-  pages.docs
-    .filter((page) => page.id !== pageId)
-    .forEach((page) => batch.update(page.ref, { isHome: false }))
-
-  await batch.commit()
+  await clearOtherHomeDocuments("pages", pageId)
 }
 
 export const pageRepository = {

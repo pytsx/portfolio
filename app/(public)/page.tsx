@@ -3,13 +3,21 @@ import { Suspense } from "react"
 
 import { BlockPage } from "@/components/block-page"
 import { publicPages } from "@/lib/pages"
+import { publicGroups } from "@/lib/groups"
 import { resolvePageCollections } from "@/lib/pages/render"
 
 async function HomeContent() {
-  const page = await publicPages.getMain()
+  const [page, group] = await Promise.all([
+    publicPages.getMain(),
+    publicGroups.getMain(),
+  ])
+
+  if (group) {
+    const collections = await resolvePageCollections(group.content, group.slug, group.id)
+    return <BlockPage title={group.title} content={group.content} collections={collections} />
+  }
 
   if (!page) notFound()
-
   const collections = await resolvePageCollections(page.content)
   return <BlockPage title={page.title} content={page.content} collections={collections} />
 }

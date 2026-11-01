@@ -1,13 +1,15 @@
 "use client"
 
 import { useActionState, useState } from "react"
-import { Save } from "lucide-react"
+import { Globe2, Lock, Save } from "lucide-react"
 
 import { Editor, type EditorCollectionData, type EditorDocument } from "@/components/editor"
 import { Button } from "@/components/ui/button"
 import { INITIAL_MUTATION_STATE, type MutationState } from "@/lib/entities/action-state"
 import type { PageGroup } from "@/lib/groups"
 import { getGroupDepth } from "@/lib/groups/tree"
+import { HomePageButton } from "../../pages/_src/home-page-button"
+import { PageActions } from "../../pages/_src/page-actions"
 
 type GroupComposerProps = {
   action(state: MutationState, data: FormData): Promise<MutationState>
@@ -19,15 +21,39 @@ type GroupComposerProps = {
 
 export function GroupComposer({ action, group, groups, defaultParentId, collections }: GroupComposerProps) {
   const [content, setContent] = useState<EditorDocument>(group?.content ?? [])
+  const [visibility, setVisibility] = useState(group?.visibility ?? "public")
+  const [isHome, setIsHome] = useState(group?.isHome ?? false)
   const [state, formAction, pending] = useActionState(action, INITIAL_MUTATION_STATE)
 
   return (
     <form action={formAction} className="min-h-[calc(100vh-4.5rem)]">
       <input type="hidden" name="content" value={JSON.stringify(content)} />
-      <header className="sticky top-0 z-20 flex h-[69px] items-center justify-end border-b bg-background/85 px-4 backdrop-blur-xl sm:px-8">
+      {isHome ? <input type="hidden" name="isHome" value="on" /> : null}
+      <header className="sticky top-0 z-20 flex h-[69px] items-center justify-end gap-2 border-b bg-background/85 px-4 backdrop-blur-xl sm:px-8">
+        <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          {visibility === "private" ? <Lock /> : <Globe2 />}
+          <span className="sr-only">Visibilidade</span>
+          <select
+            name="visibility"
+            value={visibility}
+            onChange={(event) => setVisibility(event.currentTarget.value === "private" ? "private" : "public")}
+            className="rounded-lg bg-transparent px-2 py-1.5 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="public">Público</option>
+            <option value="private">Privado</option>
+          </select>
+        </label>
+        <HomePageButton
+          pressed={isHome}
+          onPressedChange={(nextIsHome) => {
+            setIsHome(nextIsHome)
+            if (nextIsHome) setVisibility("public")
+          }}
+        />
+        <PageActions content={content} fileName={group?.slug ?? "novo-grupo"} onImport={setContent} />
         <Button type="submit" size="sm" disabled={pending}>
           <Save data-icon="inline-start" />
-          {pending ? "Salvando..." : "Salvar grupo"}
+          {pending ? "Salvando..." : "Salvar"}
         </Button>
       </header>
       <main className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-12 sm:py-20">

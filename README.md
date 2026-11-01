@@ -5,7 +5,7 @@ Um portfólio construído com Next.js e Firebase no qual a estrutura pública é
 ## Principais recursos
 
 - Editor de blocos com BlockNote e blocos de callout, YouTube e coleção de páginas.
-- Páginas públicas na raiz ou organizadas em grupos recursivos, como `/blog/artigo`.
+- Páginas públicas na raiz ou organizadas em grupos recursivos, como `/blog/artigo`. Grupos também são páginas de blocos: podem ser públicos ou privados, exportar/importar conteúdo e ser definidos como página principal.
 - Página principal configurável para a rota `/`.
 - CRUD administrativo para páginas, grupos, menus, redes sociais e configurações do portfólio.
 - Tema claro/escuro com `next-themes`.

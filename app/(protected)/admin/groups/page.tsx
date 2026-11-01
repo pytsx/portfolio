@@ -29,7 +29,12 @@ async function GroupsContent({
     <div className="mx-auto w-full max-w-5xl px-4 pb-16 sm:px-8">
       <AdminPageHeader title="Grupos" description="Organize páginas em coleções e rotas." createHref="/admin/groups?new=1" createLabel="Novo grupo" />
       <AdminEntityList
-        items={groups.map((group) => ({ id: group.id, title: group.title, description: getGroupPath(group, groups), status: "Grupo" }))}
+        items={groups.map((group) => ({
+          id: group.id,
+          title: group.title,
+          description: getGroupPath(group, groups),
+          status: group.visibility === "public" ? "Público" : "Privado",
+        }))}
         editBasePath="/admin/groups"
         emptyTitle="Nenhum grupo criado"
         emptyDescription="Crie um grupo como blog, projetos ou documentação."

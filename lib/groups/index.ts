@@ -16,12 +16,17 @@ export type PageGroup = {
   title: string
   slug: string
   content: EditorDocument
+  visibility: "public" | "private"
+  isHome: boolean
   parentId?: string
   createdAt?: Date
   updatedAt?: Date
 }
 
-export type GroupInput = Pick<PageGroup, "title" | "slug" | "content" | "parentId">
+export type GroupInput = Pick<
+  PageGroup,
+  "title" | "slug" | "content" | "visibility" | "isHome" | "parentId"
+>
 
 export function groupFromDocument(id: string, data: DocumentData): PageGroup {
   return {
@@ -29,6 +34,8 @@ export function groupFromDocument(id: string, data: DocumentData): PageGroup {
     title: typeof data.title === "string" ? data.title : "Grupo sem título",
     slug: typeof data.slug === "string" ? data.slug : id,
     content: parseEditorDocument(data.content),
+    visibility: data.visibility === "private" ? "private" : "public",
+    isHome: data.isHome === true,
     parentId: typeof data.parentId === "string" && data.parentId
       ? data.parentId
       : undefined,
@@ -43,7 +50,9 @@ async function listPublicGroups(): Promise<PageGroup[]> {
   cacheTag(cacheTags.groups)
 
   const snapshot = await getDocs(collection(db, GROUPS_COLLECTION))
-  return snapshot.docs.map((document) => groupFromDocument(document.id, document.data()))
+  return snapshot.docs
+    .filter((document) => document.data().visibility !== "private")
+    .map((document) => groupFromDocument(document.id, document.data()))
 }
 
 async function getPublicGroup(slug: string): Promise<PageGroup | null> {
@@ -54,4 +63,8 @@ async function getPublicGroup(slug: string): Promise<PageGroup | null> {
 export const publicGroups = {
   list: listPublicGroups,
   get: getPublicGroup,
+  async getMain() {
+    const groups = await listPublicGroups()
+    return groups.find((group) => group.isHome) ?? null
+  },
 }

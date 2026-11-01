@@ -39,11 +39,11 @@ export function PageWidthControl({ value, onValueChange }: PageWidthControlProps
         <span className="hidden sm:inline">{currentOption?.label}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-64">
-        <DropdownMenuLabel>Largura da página</DropdownMenuLabel>
         <DropdownMenuRadioGroup
           value={value}
           onValueChange={(nextValue) => onValueChange(nextValue as PageWidth)}
         >
+          <DropdownMenuLabel>Largura da página</DropdownMenuLabel>
           {WIDTH_OPTIONS.map((option) => (
             <DropdownMenuRadioItem key={option.value} value={option.value}>
               <span className="grid">

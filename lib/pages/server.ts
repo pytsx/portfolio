@@ -11,6 +11,7 @@ import {
   type CreatePageInput,
   type UpdatePageInput,
 } from "@/lib/pages"
+import { parsePageWidth } from "@/lib/pages/page-width"
 
 const PAGES_COLLECTION = "pages"
 
@@ -36,6 +37,7 @@ function validatePage(input: CreatePageInput): CreatePageInput {
     content: input.content,
     visibility: input.isHome ? "public" : input.visibility === "private" ? "private" : "public",
     isHome: input.isHome === true,
+    width: parsePageWidth(input.width),
     ...(input.groupSlug?.trim() ? { groupSlug: input.groupSlug.trim() } : {}),
     ...(input.groupId?.trim() ? { groupId: input.groupId.trim() } : {}),
   }

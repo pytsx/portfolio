@@ -15,6 +15,8 @@ import { getGroupDepth } from "@/lib/groups/tree"
 import { HomePageButton } from "./home-page-button"
 import { PageActions } from "./page-actions"
 import { deletePage } from "../actions"
+import { parsePageWidth } from "@/lib/pages/page-width"
+import { PageWidthControl } from "./page-width-control"
 
 type PageMutation = (
   state: MutationState,
@@ -32,6 +34,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
   const [content, setContent] = useState<EditorDocument>(page?.content ?? [])
   const [visibility, setVisibility] = useState(page?.visibility ?? "public")
   const [isHome, setIsHome] = useState(page?.isHome ?? false)
+  const [pageWidth, setPageWidth] = useState(() => parsePageWidth(page?.width))
   const [state, formAction, pending] = useActionState(
     action,
     INITIAL_MUTATION_STATE,
@@ -40,6 +43,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
   return (
     <form action={formAction} className="min-h-[calc(100vh-4.5rem)]">
       <input type="hidden" name="content" value={JSON.stringify(content)} />
+      <input type="hidden" name="width" value={pageWidth} />
       {isHome ? <input type="hidden" name="isHome" value="on" /> : null}
 
       <header className="sticky top-0 z-20 flex h-[69px] items-center justify-end gap-2 border-b bg-background/85 px-4 backdrop-blur-xl sm:px-8">
@@ -74,6 +78,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           entityId={page?.id}
           deleteAction={page ? deletePage : undefined}
         />
+        <PageWidthControl value={pageWidth} onValueChange={setPageWidth} />
         <Button type="submit" size="sm" disabled={pending}>
           <Save data-icon="inline-start" />
           {pending ? "Salvando..." : "Salvar"}
@@ -125,6 +130,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           placeholder="Digite / para escolher um bloco"
           autoFocus={Boolean(page)}
           mode="builder"
+          pageWidth={pageWidth}
         />
       </main>
     </form>

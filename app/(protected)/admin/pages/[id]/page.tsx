@@ -15,7 +15,7 @@ async function PrivatePageContent({
 
   if (!page) notFound()
 
-  return <BlockPage title={page.title} content={page.content} />
+  return <BlockPage title={page.title} content={page.content} width={page.width} />
 }
 
 export default function PrivateBlockPage({ params }: { params: Promise<{ id: string }> }) {

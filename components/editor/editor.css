@@ -89,6 +89,16 @@
 .editor-canvas[data-viewport="tablet"] { max-width: 48rem; }
 .editor-canvas[data-viewport="mobile"] { max-width: 24rem; }
 
+.page-width-frame {
+  width: 100%;
+  margin-inline: auto;
+}
+
+.page-width-frame[data-page-width="narrow"] { max-width: 48rem; }
+.page-width-frame[data-page-width="standard"] { max-width: 64rem; }
+.page-width-frame[data-page-width="wide"] { max-width: 80rem; }
+.page-width-frame[data-page-width="full"] { max-width: none; }
+
 .editor-inspector {
   position: sticky;
   top: 5.5rem;

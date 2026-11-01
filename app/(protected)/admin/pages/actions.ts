@@ -8,6 +8,7 @@ import { cacheTags } from "@/lib/cache-tags"
 import { getMutationError, type MutationState } from "@/lib/entities/action-state"
 import { readFormBoolean, readFormJson, readFormString } from "@/lib/entities/form"
 import { pageRepository } from "@/lib/pages/server"
+import { parsePageWidth } from "@/lib/pages/page-width"
 
 function readPageForm(formData: FormData) {
   return {
@@ -20,6 +21,7 @@ function readPageForm(formData: FormData) {
     groupSlug: readFormString(formData, "groupSlug") || undefined,
     groupId: readFormString(formData, "groupId") || undefined,
     isHome: readFormBoolean(formData, "isHome"),
+    width: parsePageWidth(readFormString(formData, "width")),
   }
 }
 

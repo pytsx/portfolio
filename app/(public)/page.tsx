@@ -19,7 +19,7 @@ async function HomeContent() {
 
   if (!page) notFound()
   const collections = await resolvePageCollections(page.content)
-  return <BlockPage title={page.title} content={page.content} collections={collections} />
+  return <BlockPage title={page.title} content={page.content} collections={collections} width={page.width} />
 }
 
 export default function HomePage() {

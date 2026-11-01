@@ -50,7 +50,7 @@ async function ResolvedContent({ path }: { path: string[] }) {
           undefined,
           page.groupId,
         )
-        return <BlockPage title={page.title} content={page.content} collections={collections} />
+        return <BlockPage title={page.title} content={page.content} collections={collections} width={page.width} />
       }
     }
 

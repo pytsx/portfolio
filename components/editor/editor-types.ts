@@ -1,4 +1,5 @@
 import type { editorSchema } from "./editor-schema"
+import type { PageWidth } from "@/lib/pages/page-width"
 
 export type EditorDocument = Array<typeof editorSchema.PartialBlock>
 
@@ -35,4 +36,5 @@ export interface EditorProps {
   onError?: (error: Error) => void
   collections?: EditorCollectionData
   mode?: "document" | "builder"
+  pageWidth?: PageWidth
 }

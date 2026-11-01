@@ -38,6 +38,7 @@ export function EditorClient({
   onError,
   collections,
   mode = "document",
+  pageWidth = "wide",
 }: EditorProps) {
   const { resolvedTheme } = useTheme()
   const onChangeRef = useRef(onChange)
@@ -128,7 +129,8 @@ export function EditorClient({
             </div>
           ) : null}
           <div className="editor-canvas" data-viewport={viewport}>
-            <BlockNoteView
+            <div className="page-width-frame" data-page-width={pageWidth}>
+              <BlockNoteView
               editor={editor}
               theme={resolvedTheme === "dark" ? "dark" : "light"}
               editable={editable}
@@ -147,7 +149,8 @@ export function EditorClient({
               }}
             >
               {editable ? <EditorSlashMenu editor={editor} /> : null}
-            </BlockNoteView>
+              </BlockNoteView>
+            </div>
           </div>
         </div>
         {mode === "builder" && editable ? <BlockInspector block={selectedBlock} editor={editor} /> : null}

@@ -14,6 +14,7 @@ import { parseEditorDocument } from "@/components/editor/lib/document"
 import { cacheTags } from "@/lib/cache-tags"
 import { readDate } from "@/lib/entities/document"
 import { db } from "@/lib/firebase/firebase"
+import { parsePageWidth, type PageWidth } from "@/lib/pages/page-width"
 
 const PAGES_COLLECTION = "pages"
 
@@ -26,6 +27,7 @@ export type ContentPage = {
   content: EditorDocument
   visibility: PageVisibility
   isHome: boolean
+  width: PageWidth
   groupSlug?: string
   groupId?: string
   authorId?: string
@@ -35,7 +37,7 @@ export type ContentPage = {
 
 export type CreatePageInput = Pick<
   ContentPage,
-  "title" | "slug" | "content" | "visibility" | "isHome"
+  "title" | "slug" | "content" | "visibility" | "isHome" | "width"
 > & { groupSlug?: string; groupId?: string }
 
 export type UpdatePageInput = CreatePageInput
@@ -51,6 +53,7 @@ export function pageFromDocument(
     content: parseEditorDocument(data.content),
     visibility: data.visibility === "private" ? "private" : "public",
     isHome: data.isHome === true,
+    width: parsePageWidth(data.width),
     groupSlug: typeof data.groupSlug === "string" && data.groupSlug
       ? data.groupSlug
       : undefined,

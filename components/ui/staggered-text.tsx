@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -19,7 +20,11 @@ type Part =
 type Row = { parts: Part[] };
 
 export interface StaggeredTextProps
-  extends Omit<useRender.ComponentProps<"p">, "children" | "onAnimationComplete"> {
+  extends Omit<
+    useRender.ComponentProps<"p">,
+    "children" | "onAnimationComplete" | "ref"
+  > {
+  ref?: React.Ref<HTMLElement>;
   text: string;
   as?: TextTag;
   segmentBy?: SegmentMode;
@@ -263,7 +268,7 @@ export function StaggeredText({
   const element = useRender({
     defaultTagName: as,
     render,
-    ref: [ref, elementRef],
+    ref: [ref ?? null, elementRef],
     props: mergeProps<"p">(
       {
         style: { whiteSpace: "pre-wrap" },

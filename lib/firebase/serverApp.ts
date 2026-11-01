@@ -1,9 +1,11 @@
-"use server"
-// src/lib/firebase/serverApp.ts
-import { cookies, headers } from 'next/headers';
-import { initializeServerApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import "server-only"
+
+import { cookies } from "next/headers"
+import { initializeServerApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
+import { getFirestore } from "firebase/firestore"
+
+import { SESSION_COOKIE_NAME } from "@/lib/auth/session"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,25 +16,17 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-export async function getFirebaseServer() {
-  const headersList = await headers();
-  const cookieStore = await cookies();
+export async function getFirebaseServer(idToken?: string) {
+  const cookieStore = await cookies()
+  const authIdToken = idToken ?? cookieStore.get(SESSION_COOKIE_NAME)?.value
 
-  // Obtém o token enviado pelo Authorization header (geralmente injetado via Service Worker)
-  const session = await cookieStore.get('__session');
+  const serverApp = initializeServerApp(firebaseConfig, { authIdToken })
+  const auth = getAuth(serverApp)
 
-  const authIdToken = session ? session.value : headersList.get('Authorization')?.split('Bearer ')[1] || undefined;
-
-
-  // Inicializa o app do servidor usando o token obtido
-  const serverApp = initializeServerApp(firebaseConfig, { authIdToken });
-  const auth = getAuth(serverApp);
-  
-  // Aguarda a sincronização do estado de autenticação antes de prosseguir
-  await auth.authStateReady(); 
+  await auth.authStateReady()
 
   return {
     auth,
     db: getFirestore(serverApp),
-  };
+  }
 }

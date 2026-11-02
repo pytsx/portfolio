@@ -4,7 +4,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { publicSiteSettings } from "@/lib/site-settings"
 import { cn } from "@/lib/utils"
-import { siteOrigin } from "@/lib/public/url"
+import { absoluteUrl, siteOrigin } from "@/lib/public/url"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
@@ -21,8 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.name}`,
     },
     description: settings.description,
-    openGraph: { type: "website", title: settings.name, description: settings.description },
-    twitter: { card: "summary_large_image", title: settings.name, description: settings.description },
+    openGraph: { type: "website", title: settings.name, description: settings.description, images: [absoluteUrl("/og")] },
+    twitter: { card: "summary_large_image", title: settings.name, description: settings.description, images: [absoluteUrl("/og")] },
   }
 }
 

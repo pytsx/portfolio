@@ -9,7 +9,8 @@ export type ResolvedPublicRoute =
   | { kind: "group"; path: string; entity: PageGroup }
   | { kind: "page"; path: string; entity: ContentPage }
 
-export const resolvePublicRoute = cache(async (segments: string[]): Promise<ResolvedPublicRoute | null> => {
+export const resolvePublicRoute = cache(async (pathname: string): Promise<ResolvedPublicRoute | null> => {
+  const segments = pathname.split("/").filter(Boolean)
   if (!segments.length) return null
 
   const [groups, pages] = await Promise.all([

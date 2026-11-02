@@ -7,7 +7,7 @@ import { getAuthenticatedContext } from "@/lib/auth/server"
 import { groupFromDocument, type GroupInput, type PageGroup } from "@/lib/groups"
 import { getEditorDocumentText } from "@/components/editor/lib/document"
 import { clearOtherHomeDocuments } from "@/lib/entities/home"
-import { collection, getDocs, writeBatch } from "firebase/firestore"
+import { collection, deleteDoc, doc, getDocs, setDoc, writeBatch } from "firebase/firestore"
 
 function validateGroup(input: GroupInput): GroupInput {
   const title = input.title.trim()
@@ -42,22 +42,45 @@ const baseGroupRepository = createAuthenticatedRepository<
   serializeUpdate: validateGroup,
 })
 
+async function syncPublicGroupIndex(group: PageGroup) {
+  const context = await getAuthenticatedContext()
+  if (!context) return
+  const reference = doc(context.db, "public-group-index", group.id)
+  if (group.visibility !== "public") return deleteDoc(reference)
+  await setDoc(reference, {
+    title: group.title, slug: group.slug, visibility: group.visibility, isHome: group.isHome,
+    parentId: group.parentId ?? "", updatedAt: new Date(),
+  })
+}
+
 export const groupRepository = {
   async create(input: GroupInput) {
     const group = await baseGroupRepository.create(input)
-    if (group.isHome) await clearOtherHomeDocuments("groups", group.id)
+    await syncPublicGroupIndex(group)
+    if (group.isHome) {
+      await clearOtherHomeDocuments("groups", group.id)
+      await this.migratePublicIndex()
+    }
     return group
   },
   list: baseGroupRepository.list,
   get: baseGroupRepository.get,
-  delete: baseGroupRepository.delete,
+  async delete(id: string) {
+    await baseGroupRepository.delete(id)
+    const context = await getAuthenticatedContext()
+    if (context) await deleteDoc(doc(context.db, "public-group-index", id))
+  },
   async update(id: string, input: GroupInput) {
     const group = await baseGroupRepository.get(id)
     const updatedGroup = await baseGroupRepository.update(id, {
       ...input,
       slug: group?.slug ?? input.slug,
     })
-    if (updatedGroup.isHome) await clearOtherHomeDocuments("groups", id)
+    await syncPublicGroupIndex(updatedGroup)
+    if (updatedGroup.isHome) {
+      await clearOtherHomeDocuments("groups", id)
+      await this.migratePublicIndex()
+    }
     return updatedGroup
   },
   async migrateLegacyVisibility() {
@@ -80,5 +103,10 @@ export const groupRepository = {
     }
 
     return legacyDocuments.length
+  },
+  async migratePublicIndex() {
+    const groups = await baseGroupRepository.list()
+    await Promise.all(groups.map(syncPublicGroupIndex))
+    return groups.length
   },
 }

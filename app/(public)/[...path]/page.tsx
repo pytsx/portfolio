@@ -16,11 +16,13 @@ function pageDescription(title: string, custom: string | undefined, content: Par
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { path } = await params
-  const resolved = await resolvePublicRoute(path)
+  const resolved = await resolvePublicRoute(path.join("/"))
   if (!resolved) return { title: "Página não encontrada", robots: { index: false, follow: false } }
   const entity = resolved.entity
   const description = pageDescription(entity.title, resolved.kind === "page" ? resolved.entity.description : undefined, entity.content)
-  const images = resolved.kind === "page" && resolved.entity.coverImage ? [resolved.entity.coverImage] : undefined
+  const images = resolved.kind === "page" && resolved.entity.coverImage
+    ? [resolved.entity.coverImage]
+    : [absoluteUrl(`/og?title=${encodeURIComponent(entity.title)}`)]
   const canonical = absoluteUrl(resolved.path)
 
   return {
@@ -38,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 async function ResolvedContent({ params }: Props) {
   const { path } = await params
-  const resolved = await resolvePublicRoute(path)
+  const resolved = await resolvePublicRoute(path.join("/"))
   if (!resolved) notFound()
   const entity = resolved.entity
   const collections = await resolvePageCollections(entity.content, resolved.kind === "group" ? resolved.entity.slug : undefined, resolved.kind === "group" ? resolved.entity.id : resolved.entity.groupId)

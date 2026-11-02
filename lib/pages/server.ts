@@ -12,6 +12,8 @@ import {
   type UpdatePageInput,
 } from "@/lib/pages"
 import { parsePageWidth } from "@/lib/pages/page-width"
+import { deleteDoc, doc, setDoc } from "firebase/firestore"
+import { getAuthenticatedContext } from "@/lib/auth/server"
 
 const PAGES_COLLECTION = "pages"
 
@@ -38,8 +40,8 @@ function validatePage(input: CreatePageInput): CreatePageInput {
     visibility: input.isHome ? "public" : input.visibility === "private" ? "private" : "public",
     isHome: input.isHome === true,
     width: parsePageWidth(input.width),
-    ...(input.description?.trim() ? { description: input.description.trim() } : {}),
-    ...(input.coverImage?.trim() ? { coverImage: input.coverImage.trim() } : {}),
+    description: input.description?.trim() ?? "",
+    coverImage: input.coverImage?.trim() ?? "",
     ...(input.groupSlug?.trim() ? { groupSlug: input.groupSlug.trim() } : {}),
     ...(input.groupId?.trim() ? { groupId: input.groupId.trim() } : {}),
   }
@@ -67,15 +69,35 @@ async function clearOtherHomePages(pageId: string) {
   await clearOtherHomeDocuments("pages", pageId)
 }
 
+async function syncPublicPageIndex(page: ContentPage) {
+  const context = await getAuthenticatedContext()
+  if (!context) return
+  const reference = doc(context.db, "public-page-index", page.id)
+  if (page.visibility !== "public") return deleteDoc(reference)
+  await setDoc(reference, {
+    title: page.title, slug: page.slug, visibility: page.visibility, isHome: page.isHome,
+    width: page.width, description: page.description ?? "", coverImage: page.coverImage ?? "",
+    groupSlug: page.groupSlug ?? "", groupId: page.groupId ?? "", updatedAt: new Date(),
+  })
+}
+
 export const pageRepository = {
   async create(input: CreatePageInput) {
     const page = await basePageRepository.create(input)
-    if (page.isHome) await clearOtherHomePages(page.id)
+    await syncPublicPageIndex(page)
+    if (page.isHome) {
+      await clearOtherHomePages(page.id)
+      await this.migratePublicIndex()
+    }
     return page
   },
   list: basePageRepository.list,
   get: basePageRepository.get,
-  delete: basePageRepository.delete,
+  async delete(id: string) {
+    await basePageRepository.delete(id)
+    const context = await getAuthenticatedContext()
+    if (context) await deleteDoc(doc(context.db, "public-page-index", id))
+  },
   async update(id: string, input: UpdatePageInput) {
     const existingPage = await basePageRepository.get(id)
 
@@ -83,7 +105,16 @@ export const pageRepository = {
       ...input,
       slug: existingPage?.slug ?? input.slug,
     })
-    if (page.isHome) await clearOtherHomePages(page.id)
+    await syncPublicPageIndex(page)
+    if (page.isHome) {
+      await clearOtherHomePages(page.id)
+      await this.migratePublicIndex()
+    }
     return page
+  },
+  async migratePublicIndex() {
+    const pages = await basePageRepository.list()
+    await Promise.all(pages.map(syncPublicPageIndex))
+    return pages.length
   },
 }

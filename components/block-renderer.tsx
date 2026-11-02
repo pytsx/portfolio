@@ -1,6 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
-
 import Link from "next/link"
+import Image from "next/image"
 
 import {
   CallToActionSection,
@@ -224,7 +223,7 @@ function Block({ block: sourceBlock, collections, path }: { block: EditorDocumen
       return <hr />
     case "image":
       return typeof props.url === "string" && getSafeHref(props.url)
-        ? <figure><img src={getSafeHref(props.url)} alt={typeof props.caption === "string" ? props.caption : ""} /><figcaption>{typeof props.caption === "string" ? props.caption : ""}</figcaption></figure>
+        ? <figure><Image src={getSafeHref(props.url)!} alt={typeof props.caption === "string" ? props.caption : ""} width={1200} height={675} sizes="(max-width: 768px) 100vw, 896px" className="h-auto w-full" /><figcaption>{typeof props.caption === "string" ? props.caption : ""}</figcaption></figure>
         : null
     case "video":
     case "audio":

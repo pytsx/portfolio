@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 import { CredentialsForm } from "../_src/credentials-form"
 import { establishSession } from "@/lib/auth/actions"
@@ -10,7 +11,7 @@ function getSafeRedirect(value: string | null) {
   return value?.startsWith("/") && !value.startsWith("//") ? value : "/admin"
 }
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -34,4 +35,8 @@ export default function SignInPage() {
       submitCredentials={submitSignIn}
     />
   )
+}
+
+export default function SignInPage() {
+  return <Suspense fallback={<div className="min-h-80" aria-label="Carregando formulário" />}><SignInForm /></Suspense>
 }

@@ -3,7 +3,7 @@ import "server-only"
 import type { PageCollectionItem } from "@/components/block-page"
 import type { EditorDocument } from "@/components/editor/editor-types"
 import { publicGroups } from "@/lib/groups"
-import { getGroupPath } from "@/lib/groups/tree"
+import { getPublicGroupPath } from "@/lib/public/publication"
 import { publicPages } from "@/lib/pages"
 
 export async function resolvePageCollections(
@@ -22,7 +22,7 @@ export async function resolvePageCollections(
     publicGroups.listIndex(),
   ])
   const groupPaths = new Map(
-    groups.map((group) => [group.id, getGroupPath(group, groups)]),
+    groups.map((group) => [group.id, getPublicGroupPath(group.id, groups)]),
   )
 
   const entries: Array<readonly [string, PageCollectionItem[]]> = []
@@ -37,6 +37,7 @@ export async function resolvePageCollections(
         const limit = Math.max(1, Math.min(block.props?.limit ?? 6, 50))
         const items = allPages
           .filter((page) => !groupId || page.groupId === groupId)
+          .filter((page) => !page.groupId || Boolean(groupPaths.get(page.groupId)))
           .filter((page) => block.props?.visibility === "all" || page.visibility === block.props?.visibility)
           .filter((page) => !block.props?.homeOnly || page.isHome)
           .filter((page) => !query || page.title.toLocaleLowerCase("pt-BR").includes(query))

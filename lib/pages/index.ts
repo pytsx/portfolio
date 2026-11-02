@@ -19,6 +19,7 @@ import { db } from "@/lib/firebase/firebase"
 import { parsePageWidth, type PageWidth } from "@/lib/pages/page-width"
 
 const PAGES_COLLECTION = "pages"
+const PUBLIC_PAGE_INDEX_COLLECTION = "public-page-index"
 
 export type PageVisibility = "public" | "private"
 
@@ -99,10 +100,13 @@ async function listPublicPageIndex(): Promise<PublicPageIndexItem[]> {
   cacheLife("hours")
   cacheTag(cacheTags.pages)
 
-  const snapshot = await getDocs(
-    query(collection(db, PAGES_COLLECTION), where("visibility", "==", "public")),
-  )
-  return snapshot.docs.map((document) => pageIndexItem(pageFromDocument(document.id, document.data())))
+  const snapshot = await getDocs(collection(db, PUBLIC_PAGE_INDEX_COLLECTION))
+  if (snapshot.size > 0) {
+    return snapshot.docs.map((document) => pageIndexItem(pageFromDocument(document.id, document.data())))
+  }
+  // Compatibilidade temporária para conteúdo criado antes da migração de índices.
+  const legacy = await getDocs(query(collection(db, PAGES_COLLECTION), where("visibility", "==", "public")))
+  return legacy.docs.map((document) => pageIndexItem(pageFromDocument(document.id, document.data())))
 }
 
 async function getPublicPageById(id: string): Promise<ContentPage | null> {

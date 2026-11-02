@@ -10,6 +10,7 @@ import { readDate } from "@/lib/entities/document"
 import { db } from "@/lib/firebase/firebase"
 
 const GROUPS_COLLECTION = "groups"
+const PUBLIC_GROUP_INDEX_COLLECTION = "public-group-index"
 
 export type PageGroup = {
   id: string
@@ -62,10 +63,11 @@ async function listPublicGroupIndex(): Promise<PublicGroupIndexItem[]> {
   cacheLife("hours")
   cacheTag(cacheTags.groups)
 
-  const snapshot = await getDocs(
-    query(collection(db, GROUPS_COLLECTION), where("visibility", "==", "public")),
-  )
-  return snapshot.docs.map((document) => {
+  const snapshot = await getDocs(collection(db, PUBLIC_GROUP_INDEX_COLLECTION))
+  const documents = snapshot.size > 0
+    ? snapshot.docs
+    : (await getDocs(query(collection(db, GROUPS_COLLECTION), where("visibility", "==", "public")))).docs
+  return documents.map((document) => {
     const group = groupFromDocument(document.id, document.data())
     return { id: group.id, title: group.title, slug: group.slug, visibility: group.visibility, isHome: group.isHome, parentId: group.parentId, createdAt: group.createdAt, updatedAt: group.updatedAt }
   })

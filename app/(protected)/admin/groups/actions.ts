@@ -68,3 +68,9 @@ export async function migrateLegacyGroups() {
   await groupRepository.migrateLegacyVisibility()
   revalidateGroups()
 }
+
+export async function migratePublicIndexes() {
+  const { pageRepository } = await import("@/lib/pages/server")
+  await Promise.all([groupRepository.migratePublicIndex(), pageRepository.migratePublicIndex()])
+  revalidateGroups()
+}

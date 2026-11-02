@@ -5,6 +5,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
+  ArrowLeft,
   ChevronRight,
   ExternalLink,
   FileText,
@@ -24,6 +25,7 @@ import {
 import type { AuthenticatedUser } from "@/lib/auth/server"
 import type { SidebarGroup as SidebarNavigationGroup, SidebarPage } from "@/lib/admin/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { usePageStructure, type PageLayerNode } from "@/components/editor/page-structure-context"
 
 import {
   Sidebar,
@@ -160,12 +162,14 @@ type TreePageItemProps = {
   page: SidebarPage
   depth: number
   pathname: string
+  onOpen?: () => void
 }
 
 function TreePageItem({
   page,
   depth,
   pathname,
+  onOpen,
 }: TreePageItemProps) {
   const href = `/admin/pages/${page.id}/edit`
   const active = pathname === href
@@ -175,6 +179,7 @@ function TreePageItem({
       href={href}
       title={page.title}
       aria-current={active ? "page" : undefined}
+      onClick={onOpen}
       style={{
         paddingLeft: 8 + depth * 16,
       }}
@@ -223,6 +228,7 @@ type TreeGroupItemProps = {
   query: string
   showAll: boolean
   ancestors: Set<string>
+  onOpenPage?: (pageId: string) => void
 }
 
 function TreeGroupItem({
@@ -234,6 +240,7 @@ function TreeGroupItem({
   query,
   showAll,
   ancestors,
+  onOpenPage,
 }: TreeGroupItemProps) {
   const [open, setOpen] = React.useState(true)
 
@@ -360,6 +367,7 @@ function TreeGroupItem({
           query={query}
           showAll={showAll || groupMatches}
           ancestors={new Set([...ancestors, group.id])}
+          onOpenPage={onOpenPage}
         />
       )}
     </div>
@@ -379,6 +387,7 @@ type ContentTreeProps = {
   query: string
   showAll?: boolean
   ancestors?: Set<string>
+  onOpenPage?: (pageId: string) => void
 }
 
 function ContentTree({
@@ -390,6 +399,7 @@ function ContentTree({
   query,
   showAll = false,
   ancestors = new Set<string>(),
+  onOpenPage,
 }: ContentTreeProps) {
   const childPages = pages.filter(
     (page) =>
@@ -439,6 +449,7 @@ function ContentTree({
           page={page}
           depth={depth}
           pathname={pathname}
+          onOpen={() => onOpenPage?.(page.id)}
         />
       ))}
 
@@ -453,8 +464,50 @@ function ContentTree({
           query={query}
           showAll={showAll}
           ancestors={ancestors}
+          onOpenPage={onOpenPage}
         />
       ))}
+    </div>
+  )
+}
+
+function PageLayersTree({
+  layers,
+  depth = 0,
+  selectedBlockId,
+  onSelect,
+}: {
+  layers: PageLayerNode[]
+  depth?: number
+  selectedBlockId?: string
+  onSelect: (blockId: string) => void
+}) {
+  return (
+    <div className="flex min-w-0 flex-col gap-px">
+      {layers.map((layer) => {
+        const selected = layer.id === selectedBlockId
+        return (
+          <React.Fragment key={layer.id}>
+            <button
+              type="button"
+              onClick={() => onSelect(layer.id)}
+              aria-current={selected ? "true" : undefined}
+              title={layer.label}
+              style={{ paddingLeft: 8 + depth * 16 }}
+              className={`group/layer flex min-h-8 w-full min-w-0 items-center gap-1 rounded-md pr-2 text-left text-[13px] leading-5 transition-colors duration-150 ${selected ? "sidebar-main-page font-medium text-sidebar-accent-foreground" : "text-sidebar-foreground/75 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground"}`}
+            >
+              <span className="flex size-5 shrink-0 items-center justify-center">
+                {layer.children.length > 0 ? <ChevronRight className="size-3.5 rotate-90 text-sidebar-foreground/45" /> : null}
+              </span>
+              {layer.children.length > 0
+                ? <Layers3 className="size-[17px] shrink-0 text-sidebar-foreground/55" strokeWidth={1.75} />
+                : <FileText className="size-[17px] shrink-0 text-sidebar-foreground/50" strokeWidth={1.75} />}
+              <span className="min-w-0 flex-1 truncate px-1">{layer.label}</span>
+            </button>
+            {layer.children.length > 0 ? <PageLayersTree layers={layer.children} depth={depth + 1} selectedBlockId={selectedBlockId} onSelect={onSelect} /> : null}
+          </React.Fragment>
+        )
+      })}
     </div>
   )
 }
@@ -475,6 +528,12 @@ export function AdminSidebar({
   user,
 }: AdminSidebarProps) {
   const pathname = usePathname()
+  const { page: pageStructure, selectedBlockId, selectFromSidebar } = usePageStructure()
+  const editorPageId = pathname.match(/^\/admin\/pages\/([^/]+)\/edit$/)?.[1]
+  const [pagesModeFor, setPagesModeFor] = React.useState<string>()
+  const showPageLayers = Boolean(editorPageId && pagesModeFor !== editorPageId)
+  const activePageStructure = pageStructure?.pageId === editorPageId ? pageStructure : undefined
+  const currentPageTitle = activePageStructure?.pageTitle ?? pages.find((page) => page.id === editorPageId)?.title ?? "Página"
 
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [search, setSearch] = React.useState("")
@@ -562,6 +621,33 @@ export function AdminSidebar({
         {/* Expanded navigation */}
 
         <div className="group-data-[collapsible=icon]:hidden">
+          {showPageLayers ? (
+            <SidebarGroup className="p-0 pt-3">
+              <div className="flex items-center gap-2 px-2 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setPagesModeFor(editorPageId)}
+                  aria-label="Voltar para a árvore de páginas"
+                  title="Voltar para páginas"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/65 transition-colors hover:bg-sidebar-accent/70 hover:text-sidebar-foreground"
+                >
+                  <ArrowLeft className="size-4" />
+                </button>
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-semibold text-sidebar-foreground">{currentPageTitle}</p>
+                  <p className="text-[11px] text-muted-foreground">Estrutura da página</p>
+                </div>
+              </div>
+              <div className="flex h-9 items-center px-4 text-[11px] font-semibold tracking-[0.035em] text-sidebar-foreground/50">ELEMENTOS</div>
+              <SidebarGroupContent className="px-2">
+                {activePageStructure ? (
+                  <PageLayersTree layers={activePageStructure.layers} selectedBlockId={selectedBlockId} onSelect={selectFromSidebar} />
+                ) : (
+                  <p className="px-2 py-4 text-xs text-muted-foreground">Carregando estrutura...</p>
+                )}
+              </SidebarGroupContent>
+            </SidebarGroup>
+          ) : <>
           {/* Search */}
 
           <div className="px-2 pb-2 pt-3">
@@ -666,6 +752,7 @@ export function AdminSidebar({
                 pages={pages}
                 pathname={pathname}
                 query={query}
+                onOpenPage={() => setPagesModeFor(undefined)}
               />
 
               {!query && (
@@ -686,6 +773,7 @@ export function AdminSidebar({
               )}
             </SidebarGroupContent>
           </SidebarGroup>
+          </>}
         </div>
 
         {/* Icon-only navigation */}
@@ -696,7 +784,11 @@ export function AdminSidebar({
             group-data-[collapsible=icon]:flex
           "
         >
-          {rootPages.map((page) => {
+          {showPageLayers ? (
+            <button type="button" onClick={() => setPagesModeFor(editorPageId)} title="Voltar para páginas" aria-label="Voltar para páginas" className="flex size-8 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent">
+              <ArrowLeft className="size-[18px]" />
+            </button>
+          ) : rootPages.map((page) => {
             const href = `/admin/pages/${page.id}/edit`
             return (
               <Link
@@ -712,7 +804,7 @@ export function AdminSidebar({
             )
           })}
 
-          {rootGroups.map((group) => {
+          {!showPageLayers && rootGroups.map((group) => {
             const href = `/admin/groups/${group.id}/edit`
             return (
               <Link

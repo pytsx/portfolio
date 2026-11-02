@@ -37,4 +37,6 @@ export interface EditorProps {
   collections?: EditorCollectionData
   mode?: "document" | "builder"
   pageWidth?: PageWidth
+  pageId?: string
+  pageTitle?: string
 }

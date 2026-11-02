@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { syntaxHighlighter } from "@blocknote/code-block"
 import { pt } from "@blocknote/core/locales"
 import { useCreateBlockNote } from "@blocknote/react"
@@ -15,6 +15,7 @@ import { BlockInspector } from "./components/block-inspector"
 import { editorSchema } from "./editor-schema"
 import type { EditorDocument, EditorProps } from "./editor-types"
 import { areEditorDocumentsEqual, normalizeEditorDocument } from "./lib/document"
+import { usePageStructure } from "./page-structure-context"
 
 import "@blocknote/core/fonts/inter.css"
 import "@blocknote/shadcn/style.css"
@@ -39,6 +40,8 @@ export function EditorClient({
   collections,
   mode = "document",
   pageWidth = "wide",
+  pageId,
+  pageTitle = "Sem título",
 }: EditorProps) {
   const { resolvedTheme } = useTheme()
   const onChangeRef = useRef(onChange)
@@ -48,6 +51,7 @@ export function EditorClient({
   const appliesExternalDocumentRef = useRef(false)
   const [selectedBlock, setSelectedBlock] = useState<SelectedBlock>()
   const [viewport, setViewport] = useState<BuilderViewport>("desktop")
+  const { page: sidebarPage, publishPage, clearPage, selectFromEditor, selectionRequest } = usePageStructure()
 
   useEffect(() => {
     onChangeRef.current = onChange
@@ -82,6 +86,24 @@ export function EditorClient({
       : undefined,
   })
 
+  const updateSelectedBlock = useCallback(() => {
+    const selectionBlock = editor.getSelection()?.blocks[0]
+    if (selectionBlock) {
+      setSelectedBlock(editor.getBlock(selectionBlock.id))
+      selectFromEditor(selectionBlock.id)
+      return
+    }
+
+    try {
+      const cursorBlock = editor.getTextCursorPosition().block
+      setSelectedBlock(editor.getBlock(cursorBlock.id))
+      selectFromEditor(cursorBlock.id)
+    } catch {
+      setSelectedBlock(undefined)
+      selectFromEditor(undefined)
+    }
+  }, [editor, selectFromEditor])
+
   useEffect(() => {
     if (!autoFocus || !editable) return
     editor.focus()
@@ -100,19 +122,19 @@ export function EditorClient({
     })
   }, [editor, value])
 
-  function updateSelectedBlock() {
-    const selectionBlock = editor.getSelection()?.blocks[0]
-    if (selectionBlock) {
-      setSelectedBlock(editor.getBlock(selectionBlock.id))
-      return
-    }
+  useEffect(() => {
+    if (!pageId || mode !== "builder") return
+    publishPage(pageId, pageTitle, editor.document as EditorDocument)
+    return () => clearPage(pageId)
+  }, [clearPage, editor, mode, pageId, pageTitle, publishPage])
 
-    try {
-      setSelectedBlock(editor.getBlock(editor.getTextCursorPosition().block.id))
-    } catch {
-      setSelectedBlock(undefined)
-    }
-  }
+  useEffect(() => {
+    if (!pageId || sidebarPage?.pageId !== pageId || !selectionRequest) return
+    if (!editor.getBlock(selectionRequest.blockId)) return
+    editor.setSelection(selectionRequest.blockId, selectionRequest.blockId)
+    editor.focus()
+    queueMicrotask(updateSelectedBlock)
+  }, [editor, pageId, selectionRequest, sidebarPage?.pageId, updateSelectedBlock])
 
   return (
     <PageCollectionProvider collections={collections}>
@@ -145,6 +167,7 @@ export function EditorClient({
                 const document = editor.document as EditorDocument
                 lastEmittedDocumentRef.current = document
                 onChangeRef.current(document)
+                if (pageId && mode === "builder") publishPage(pageId, pageTitle, document)
                 updateSelectedBlock()
               }}
             >

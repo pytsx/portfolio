@@ -160,6 +160,8 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           autoFocus={Boolean(page)}
           mode="builder"
           pageWidth={pageWidth}
+          pageId={page?.id}
+          pageTitle={page?.title}
         />
       </main>
     </form>

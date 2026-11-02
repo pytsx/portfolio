@@ -40,20 +40,6 @@ export function BlockInspector({ block, editor }: { block: SelectedBlock; editor
           <button type="button" onClick={() => editor.insertBlocks([duplicateWithoutIds(block)], block.id, "after")}>Duplicar</button>
         </> : null}
       </div>
-      <details>
-        <summary className="text-sm">Camadas</summary>
-        <div className="grid gap-1 py-2">
-          {(() => {
-            function layers(blocks: EditorInstance["document"], depth = 0): React.ReactNode {
-              return blocks.map((item) => <div key={item.id}>
-                <button type="button" className="w-full rounded px-2 py-1 text-left text-xs aria-pressed:bg-accent" style={{ paddingLeft: 8 + depth * 12 }} aria-pressed={block?.id === item.id} onClick={() => { editor.setSelection(item.id, item.id); editor.focus() }}>{item.type}</button>
-                {layers(item.children, depth + 1)}
-              </div>)
-            }
-            return layers(editor.document)
-          })()}
-        </div>
-      </details>
       {block && fields ? (
         <div className="editor-inspector-fields">
           {fields.map((field) => (

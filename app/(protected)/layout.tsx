@@ -5,6 +5,7 @@ import { Suspense, type ReactNode } from "react";
 import { connection } from "next/server";
 import { AdminSidebar } from "./_src/admin-sidebar";
 import { getAdminNavigation } from "@/lib/admin/navigation";
+import { PageStructureProvider } from "@/components/editor/page-structure-context";
 
 export const metadata: Metadata = {
   title: "Administração | Henrique Pessoa",
@@ -18,10 +19,12 @@ async function AuthenticatedShell({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
-      <AdminSidebar groups={groups} pages={pages} user={user} />
-      <main className="min-w-0 flex-1">
-        {children}
-      </main>
+      <PageStructureProvider>
+        <AdminSidebar groups={groups} pages={pages} user={user} />
+        <main className="min-w-0 flex-1">
+          {children}
+        </main>
+      </PageStructureProvider>
     </SidebarProvider>
   )
 }

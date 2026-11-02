@@ -1,45 +1,91 @@
-import { createReactBlockSpec } from "@blocknote/react"
+import type { EditorDocument } from "../editor-types"
 
-import {
-  CallToActionSection,
-  FeatureGridSection,
-  type CallToActionSectionProps,
-  type FeatureGridSectionProps,
-} from "../components/web-page-sections"
-
-type WebBlockProperties = Record<string, string>
-
-function asFeatureGridProps(props: WebBlockProperties): FeatureGridSectionProps {
-  return {
-    title: props.title ?? "",
-    description: props.description ?? "",
-    firstTitle: props.firstTitle ?? "",
-    firstDescription: props.firstDescription ?? "",
-    secondTitle: props.secondTitle ?? "",
-    secondDescription: props.secondDescription ?? "",
-    thirdTitle: props.thirdTitle ?? "",
-    thirdDescription: props.thirdDescription ?? "",
-    preview: true,
-  }
+type FeatureGridContent = {
+  title?: string; description?: string
+  firstTitle?: string; firstDescription?: string
+  secondTitle?: string; secondDescription?: string
+  thirdTitle?: string; thirdDescription?: string
 }
 
-function asCallToActionProps(props: WebBlockProperties): CallToActionSectionProps {
-  return {
-    title: props.title ?? "",
-    description: props.description ?? "",
-    label: props.label ?? "",
-    href: props.href ?? "",
-    appearance: props.appearance === "gradient" ? "gradient" : props.appearance === "inverted" ? "inverted" : "default",
-    preview: true,
-  }
+type CallToActionContent = {
+  title?: string; description?: string; label?: string; href?: string; appearance?: string
 }
 
-export const featureGridBlock = createReactBlockSpec(
-  { type: "featureGrid", propSchema: { title: { default: "O que torna este trabalho especial" }, description: { default: "Apresente os diferenciais que sustentam a sua proposta." }, firstTitle: { default: "Estratégia" }, firstDescription: { default: "Decisões guiadas por contexto e objetivo." }, secondTitle: { default: "Design" }, secondDescription: { default: "Interfaces claras, expressivas e acessíveis." }, thirdTitle: { default: "Tecnologia" }, thirdDescription: { default: "Implementação sólida e preparada para evoluir." } }, content: "none" },
-  { render: ({ block }) => <div className="editor-web-block"><FeatureGridSection {...asFeatureGridProps(block.props)} /></div> },
-)()
+function featureCard(title: string, description: string): EditorDocument[number] {
+  return {
+    type: "column",
+    children: [{
+      type: "card",
+      props: { surface: "card", padding: "md", radius: "md", border: "subtle", shadow: "sm" },
+      children: [{
+        type: "stack",
+        props: { direction: "column", gap: "sm", justify: "start", align: "stretch", wrap: false },
+        children: [
+          { type: "heading", props: { level: 3 }, content: title },
+          { type: "paragraph", content: description },
+        ],
+      }],
+    }],
+  } as EditorDocument[number]
+}
 
-export const callToActionBlock = createReactBlockSpec(
-  { type: "callToAction", propSchema: { title: { default: "Vamos construir algo juntos?" }, description: { default: "Entre em contato para conversar sobre o próximo projeto." }, label: { default: "Entrar em contato" }, href: { default: "/contato" }, appearance: { default: "gradient", values: ["default", "inverted", "gradient"] as const } }, content: "none" },
-  { render: ({ block }) => <div className="editor-web-block"><CallToActionSection {...asCallToActionProps(block.props)} /></div> },
-)()
+/** Preset only: every piece of content remains an ordinary inline-editable block. */
+export function createFeatureGridTemplate(content: FeatureGridContent = {}): EditorDocument[number] {
+  return {
+    type: "section",
+    props: { width: "wide", surface: "transparent", spacing: "lg", radius: "none", contentAlignment: "left", verticalAlignment: "start", minHeight: "auto" },
+    children: [{
+      type: "stack",
+      props: { direction: "column", gap: "lg", justify: "start", align: "stretch", wrap: false },
+      children: [
+        {
+          type: "stack",
+          props: { direction: "column", gap: "sm", justify: "start", align: "stretch", wrap: false },
+          children: [
+            { type: "heading", props: { level: 2 }, content: content.title ?? "O que torna este trabalho especial" },
+            { type: "paragraph", content: content.description ?? "Apresente os diferenciais que sustentam a sua proposta." },
+          ],
+        },
+        {
+          type: "columns",
+          props: { distribution: "equal", gap: "md", mobile: "stack", align: "stretch" },
+          children: [
+            featureCard(content.firstTitle ?? "Estratégia", content.firstDescription ?? "Decisões guiadas por contexto e objetivo."),
+            featureCard(content.secondTitle ?? "Design", content.secondDescription ?? "Interfaces claras, expressivas e acessíveis."),
+            featureCard(content.thirdTitle ?? "Tecnologia", content.thirdDescription ?? "Implementação sólida e preparada para evoluir."),
+          ],
+        },
+      ],
+    }],
+  } as EditorDocument[number]
+}
+
+/** Preset only: title, description and action are native editable children. */
+export function createCallToActionTemplate(content: CallToActionContent = {}): EditorDocument[number] {
+  const surface = content.appearance === "inverted" ? "contrast" : content.appearance === "default" ? "muted" : "gradient"
+  return {
+    type: "section",
+    props: { width: "wide", surface, spacing: "lg", radius: "lg", contentAlignment: "left", verticalAlignment: "center", minHeight: "auto" },
+    children: [{
+      type: "columns",
+      props: { distribution: "sidebar-right", gap: "lg", mobile: "stack", align: "center" },
+      children: [
+        {
+          type: "column",
+          children: [{
+            type: "stack",
+            props: { direction: "column", gap: "sm", justify: "start", align: "stretch", wrap: false },
+            children: [
+              { type: "heading", props: { level: 2 }, content: content.title ?? "Vamos construir algo juntos?" },
+              { type: "paragraph", content: content.description ?? "Entre em contato para conversar sobre o próximo projeto." },
+            ],
+          }],
+        },
+        {
+          type: "column",
+          children: [{ type: "button", props: { href: content.href ?? "/contato", variant: "primary" }, content: content.label ?? "Entrar em contato" }],
+        },
+      ],
+    }],
+  } as EditorDocument[number]
+}

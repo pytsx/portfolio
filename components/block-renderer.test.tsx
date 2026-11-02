@@ -52,7 +52,11 @@ describe("public block renderer", () => {
       children: [{
         type: "stack",
         props: { direction: "row", justify: "center", align: "center", gap: "lg", wrap: true },
-        children: [{ type: "button", props: { href: "/contato", variant: "primary" }, content: "Contato" }],
+        children: [{
+          type: "card",
+          props: { surface: "card", padding: "lg", radius: "lg", border: "subtle", shadow: "md" },
+          children: [{ type: "button", props: { href: "/contato", variant: "primary" }, content: "Contato" }],
+        }],
       }],
     }])
 
@@ -60,6 +64,8 @@ describe("public block renderer", () => {
     expect(html).toContain('data-content-alignment="center"')
     expect(html).toContain('data-min-height="screen"')
     expect(html).toContain('class="page-layout-stack"')
+    expect(html).toContain('class="page-layout-card"')
+    expect(html).toContain('data-shadow="md"')
     expect(html).toContain('href="/contato"')
   })
 })

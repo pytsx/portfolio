@@ -1,14 +1,38 @@
 import type { EditorDocument } from "../editor-types"
+import { createCallToActionTemplate, createFeatureGridTemplate } from "../blocks/web-page-blocks"
 
 type LegacyBlock = { id?: string; type: string; props?: Record<string, unknown>; content?: unknown; children?: unknown[] }
 
 function text(value: unknown, fallback = "") { return typeof value === "string" ? value : fallback }
+function optionalText(value: unknown) { return typeof value === "string" ? value : undefined }
 function isBlock(value: unknown): value is LegacyBlock { return typeof value === "object" && value !== null && "type" in value && typeof value.type === "string" }
 function migrateChildren(children: unknown): EditorDocument { return Array.isArray(children) ? children.filter(isBlock).map(migrateLegacyLayoutBlock) : [] }
 
 /** Converts removed Hero blocks into equivalent layouts assembled from editor primitives. */
 export function migrateLegacyLayoutBlock(block: LegacyBlock): EditorDocument[number] {
   const props = block.props ?? {}
+
+  if (block.type === "featureGrid") {
+    return {
+      ...createFeatureGridTemplate({
+        title: optionalText(props.title), description: optionalText(props.description),
+        firstTitle: optionalText(props.firstTitle), firstDescription: optionalText(props.firstDescription),
+        secondTitle: optionalText(props.secondTitle), secondDescription: optionalText(props.secondDescription),
+        thirdTitle: optionalText(props.thirdTitle), thirdDescription: optionalText(props.thirdDescription),
+      }),
+      id: block.id,
+    } as EditorDocument[number]
+  }
+
+  if (block.type === "callToAction") {
+    return {
+      ...createCallToActionTemplate({
+        title: optionalText(props.title), description: optionalText(props.description), label: optionalText(props.label),
+        href: text(props.href, "/contato"), appearance: text(props.appearance, "gradient"),
+      }),
+      id: block.id,
+    } as EditorDocument[number]
+  }
 
   if (block.type === "heroLayout") {
     return {

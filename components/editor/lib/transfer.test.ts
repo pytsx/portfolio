@@ -24,5 +24,12 @@ describe("editor transfer", () => {
 
   it("documents the page collection block for LLM imports", () => {
     expect(editorDocumentJsonSchema.items.properties.type.enum).toContain("pageCollection")
+    expect(editorDocumentJsonSchema.items.properties.type.enum).toContain("card")
+    expect(editorDocumentJsonSchema.items.properties.type.enum).not.toContain("featureGrid")
+  })
+
+  it("migrates imported legacy web components into editable primitives", () => {
+    const [block] = parseImportedEditorDocument([{ type: "callToAction", props: { title: "Contato" } }])
+    expect(block.type).toBe("section")
   })
 })

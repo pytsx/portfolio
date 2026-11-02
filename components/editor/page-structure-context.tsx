@@ -50,12 +50,11 @@ const BLOCK_LABELS: Record<string, string> = {
   youtube: "YouTube",
   pageCollection: "Coleção de páginas",
   button: "Botão",
-  featureGrid: "Grade de destaques",
-  callToAction: "Chamada para ação",
   section: "Seção",
   columns: "Colunas",
   column: "Coluna",
   stack: "Pilha",
+  card: "Card",
 }
 
 export function createPageLayers(document: EditorDocument): PageLayerNode[] {

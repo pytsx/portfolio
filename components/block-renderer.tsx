@@ -3,17 +3,13 @@ import Image from "next/image"
 import type { ReactNode } from "react"
 
 import {
-  CallToActionSection,
-  FeatureGridSection,
-  type CallToActionSectionProps,
-  type FeatureGridSectionProps,
-} from "./editor/components/web-page-sections"
-import {
+  PageCard,
   PageColumn,
   PageColumns,
   PageSection,
   PageStack,
   type PageColumnsProperties,
+  type PageCardProperties,
   type PageSectionProperties,
   type PageStackProperties,
 } from "./editor/components/page-layouts"
@@ -204,29 +200,6 @@ function YouTubeBlock({ props }: { props: Record<string, unknown> }) {
   )
 }
 
-function asFeatureGridProps(props: Record<string, unknown>): FeatureGridSectionProps {
-  return {
-    title: typeof props.title === "string" ? props.title : "",
-    description: typeof props.description === "string" ? props.description : "",
-    firstTitle: typeof props.firstTitle === "string" ? props.firstTitle : "",
-    firstDescription: typeof props.firstDescription === "string" ? props.firstDescription : "",
-    secondTitle: typeof props.secondTitle === "string" ? props.secondTitle : "",
-    secondDescription: typeof props.secondDescription === "string" ? props.secondDescription : "",
-    thirdTitle: typeof props.thirdTitle === "string" ? props.thirdTitle : "",
-    thirdDescription: typeof props.thirdDescription === "string" ? props.thirdDescription : "",
-  }
-}
-
-function asCallToActionProps(props: Record<string, unknown>): CallToActionSectionProps {
-  return {
-    title: typeof props.title === "string" ? props.title : "",
-    description: typeof props.description === "string" ? props.description : "",
-    label: typeof props.label === "string" ? props.label : "",
-    href: typeof props.href === "string" ? getSafeHref(props.href) ?? "#" : "#",
-    appearance: props.appearance === "gradient" ? "gradient" : props.appearance === "inverted" ? "inverted" : "default",
-  }
-}
-
 function asSectionProperties(props: Record<string, unknown>): PageSectionProperties {
   return {
     width: props.width === "narrow" || props.width === "standard" || props.width === "full" ? props.width : "wide",
@@ -260,12 +233,22 @@ function asStackProperties(props: Record<string, unknown>): PageStackProperties 
   }
 }
 
+function asCardProperties(props: Record<string, unknown>): PageCardProperties {
+  return {
+    surface: props.surface === "transparent" || props.surface === "muted" || props.surface === "contrast" ? props.surface : "card",
+    padding: props.padding === "sm" || props.padding === "lg" ? props.padding : "md",
+    radius: props.radius === "none" || props.radius === "sm" || props.radius === "lg" ? props.radius : "md",
+    border: props.border === "none" ? "none" : "subtle",
+    shadow: props.shadow === "none" || props.shadow === "md" ? props.shadow : "sm",
+  }
+}
+
 type BlockProps = { block: EditorDocument[number]; collections: Record<string, BlockCollectionItem[]>; path: string }
 
 function Block(props: BlockProps) {
   const properties = asRenderableBlock(props.block).props ?? {}
   const alignment = properties.textAlignment
-  const rendersOwnChildren = ["bulletListItem", "numberedListItem", "quote", "toggleListItem", "section", "columns", "column", "stack"].includes(props.block.type ?? "")
+  const rendersOwnChildren = ["bulletListItem", "numberedListItem", "quote", "toggleListItem", "section", "columns", "column", "stack", "card"].includes(props.block.type ?? "")
   return <div
     className="portfolio-block-content"
     data-content-type={props.block.type}
@@ -323,10 +306,6 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
       return <aside className="editor-callout" data-tone={typeof props.tone === "string" ? props.tone : "info"} role="note"><span className="editor-callout-icon">{typeof props.icon === "string" ? props.icon : "💡"}</span><div><InlineText content={block.content} /></div></aside>
     case "youtube":
       return <YouTubeBlock props={props} />
-    case "featureGrid":
-      return <FeatureGridSection {...asFeatureGridProps(props)} />
-    case "callToAction":
-      return <CallToActionSection {...asCallToActionProps(props)} />
     case "toggleListItem":
       return <details><summary>{content}</summary><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></details>
     case "table":
@@ -339,6 +318,8 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
       return <PageColumn><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumn>
     case "stack":
       return <PageStack properties={asStackProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageStack>
+    case "card":
+      return <PageCard properties={asCardProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageCard>
     case "pageCollection":
       return <PageCollection items={collections[blockKey] ?? []} layout={props.layout === "list" ? "list" : "grid"} />
     default:

@@ -297,7 +297,7 @@
 .page-layout-columns > div {
   display: grid;
   gap: var(--page-columns-gap, 1.5rem);
-  grid-template-columns: var(--page-columns-template, repeat(2, minmax(0, 1fr)));
+  grid-template-columns: var(--page-columns-template, repeat(auto-fit, minmax(min(14rem, 100%), 1fr)));
 }
 
 .page-layout-columns[data-gap="sm"] { --page-columns-gap: 0.75rem; }
@@ -331,17 +331,26 @@
 .page-layout-stack[data-align="end"] { --page-stack-align: flex-end; }
 .page-layout-stack[data-wrap="true"] > div { flex-wrap: wrap; }
 
+.page-layout-card { min-width: 0; height: 100%; }
+.page-layout-card[data-surface="card"] { background: var(--card); color: var(--card-foreground); }
+.page-layout-card[data-surface="muted"] { background: var(--muted); }
+.page-layout-card[data-surface="contrast"] { background: var(--foreground); color: var(--background); }
+.page-layout-card[data-padding="sm"] { padding: 1rem; }
+.page-layout-card[data-padding="md"] { padding: 1.5rem; }
+.page-layout-card[data-padding="lg"] { padding: 2rem; }
+.page-layout-card[data-radius="sm"] { border-radius: 0.5rem; }
+.page-layout-card[data-radius="md"] { border-radius: 1rem; }
+.page-layout-card[data-radius="lg"] { border-radius: 1.5rem; }
+.page-layout-card[data-border="subtle"] { border: 1px solid var(--border); }
+.page-layout-card[data-shadow="sm"] { box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
+.page-layout-card[data-shadow="md"] { box-shadow: 0 10px 30px -15px rgb(0 0 0 / 25%); }
+
 .portfolio-editor .page-layout-section[data-editor-frame="true"],
 .portfolio-editor .page-layout-columns[data-editor-frame="true"],
-.portfolio-editor .page-layout-stack[data-editor-frame="true"] {
+.portfolio-editor .page-layout-stack[data-editor-frame="true"],
+.portfolio-editor .page-layout-card[data-editor-frame="true"] {
   outline: 1px dashed color-mix(in oklch, var(--border) 80%, transparent);
   outline-offset: 0.25rem;
-}
-
-.page-web-section {
-  width: 100%;
-  max-width: 80rem;
-  margin-inline: auto;
 }
 
 .page-layout-section[data-effect="fade"] { animation: page-layout-fade 500ms ease both; }
@@ -397,40 +406,6 @@
 .editor-youtube-input input:focus-visible {
   border-color: var(--ring);
   box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 25%, transparent);
-}
-
-.editor-web-block {
-  display: grid;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-.editor-web-block-fields {
-  display: grid;
-  gap: 0.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  border: 1px dashed var(--border);
-  border-radius: 1rem;
-  background: color-mix(in oklch, var(--muted) 45%, transparent);
-  padding: 0.75rem;
-}
-
-.editor-web-block-fields label {
-  display: grid;
-  gap: 0.25rem;
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
-}
-
-.editor-web-block-fields input,
-.editor-web-block-fields select {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: var(--background);
-  color: var(--foreground);
-  padding: 0.5rem 0.625rem;
-  font-size: 0.875rem;
 }
 
 .editor-page-collection {

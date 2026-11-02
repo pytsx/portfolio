@@ -120,7 +120,7 @@ export function EditorClient({
   const selectLayoutFromPointer = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     const target = event.target
     if (!(target instanceof HTMLElement)) return
-    const layout = target.closest<HTMLElement>(".page-layout-section, .page-layout-columns, .page-layout-column, .page-layout-stack")
+    const layout = target.closest<HTMLElement>(".page-layout-section, .page-layout-columns, .page-layout-column, .page-layout-stack, .page-layout-card")
     if (!layout) return
 
     const layoutBlock = layout.closest<HTMLElement>("[data-node-type=\"blockContainer\"][data-id]")

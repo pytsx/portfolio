@@ -9,7 +9,8 @@ import {
 import { AlignJustify, Columns3, FileStack, FileVideoCamera, Lightbulb, PanelsTopLeft, Send, SquareDashed } from "lucide-react"
 
 import type { editorSchema } from "../editor-schema"
-import { buttonDefinition, stackDefinition } from "../component-registry"
+import { buttonDefinition, cardDefinition, stackDefinition } from "../component-registry"
+import { createCallToActionTemplate, createFeatureGridTemplate } from "../blocks/web-page-blocks"
 
 type EditorInstance = typeof editorSchema.BlockNoteEditor
 
@@ -49,6 +50,17 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
               }),
             },
             {
+              title: cardDefinition.title,
+              subtext: cardDefinition.description,
+              aliases: ["card", "cartão", "caixa", "container"],
+              group: "Estrutura",
+              icon: <PanelsTopLeft className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, {
+                type: "card",
+                children: [{ type: "paragraph" }],
+              }),
+            },
+            {
               title: "Duas colunas",
               subtext: "Organize blocos lado a lado",
               aliases: ["colunas", "columns", "grid", "duas"],
@@ -83,7 +95,7 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
               aliases: ["destaques", "features", "cards", "grade"],
               group: "Página web",
               icon: <PanelsTopLeft className="size-4" />,
-              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "featureGrid" }),
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, createFeatureGridTemplate()),
             },
             {
               title: "Chamada para ação",
@@ -91,7 +103,7 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
               aliases: ["cta", "ação", "botão", "contato"],
               group: "Página web",
               icon: <Send className="size-4" />,
-              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "callToAction" }),
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, createCallToActionTemplate()),
             },
             {
               title: "Callout",

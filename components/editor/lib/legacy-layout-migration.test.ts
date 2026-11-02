@@ -51,4 +51,14 @@ describe("legacy layout migration", () => {
     expect(copy.id).toBeUndefined()
     expect(copy.children?.[0]?.id).toBeUndefined()
   })
+
+  it("turns legacy web sections into editable compositions", () => {
+    const migrated = migrateLegacyEditorValue([
+      { type: "featureGrid", props: { title: "Diferenciais", firstTitle: "Estratégia" } },
+      { type: "callToAction", props: { title: "Vamos conversar", label: "Contato", href: "/contato" } },
+    ])
+
+    expect(types(migrated)).toEqual(expect.arrayContaining(["section", "columns", "card", "heading", "paragraph", "button"]))
+    expect(types(migrated)).not.toEqual(expect.arrayContaining(["featureGrid", "callToAction"]))
+  })
 })

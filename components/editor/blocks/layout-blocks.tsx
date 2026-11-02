@@ -1,7 +1,7 @@
 import { createReactBlockSpec } from "@blocknote/react"
 
-import { PageColumn, PageColumns, PageSection, PageStack } from "../components/page-layouts"
-import { stackDefinition } from "../component-registry"
+import { PageCard, PageColumn, PageColumns, PageSection, PageStack } from "../components/page-layouts"
+import { cardDefinition, stackDefinition } from "../component-registry"
 
 export const sectionBlock = createReactBlockSpec(
   {
@@ -65,7 +65,15 @@ export const columnsBlock = createReactBlockSpec(
 export const stackBlock = createReactBlockSpec(
   {
     type: "stack", propSchema: stackDefinition.propSchema, content: "none",
-    layoutOnly: true, children: { allow: "blocks", exclude: ["section", "columns"] as const },
+    layoutOnly: true, children: { allow: "blocks", exclude: ["section"] as const },
   },
   { renderFrame: ({ block, slotRef }) => <PageStack properties={block.props} editor><div ref={slotRef} /></PageStack> },
+)()
+
+export const cardBlock = createReactBlockSpec(
+  {
+    type: "card", propSchema: cardDefinition.propSchema, content: "none",
+    layoutOnly: true, children: { allow: "blocks", exclude: ["section", "columns"] as const },
+  },
+  { renderFrame: ({ block, slotRef }) => <PageCard properties={block.props} editor><div ref={slotRef} /></PageCard> },
 )()

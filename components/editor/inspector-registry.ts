@@ -28,15 +28,11 @@ export const inspectorFields: Record<string, PropertyField[]> = {
     { key: "mobile", label: "Mobile", options: options("stack", "scroll") },
     { key: "align", label: "Alinhamento", options: options("start", "center", "end", "stretch") },
   ],
-  featureGrid: [
-    { key: "title", label: "Título" }, { key: "description", label: "Descrição" },
-    { key: "firstTitle", label: "Destaque 1" }, { key: "firstDescription", label: "Descrição 1" },
-    { key: "secondTitle", label: "Destaque 2" }, { key: "secondDescription", label: "Descrição 2" },
-    { key: "thirdTitle", label: "Destaque 3" }, { key: "thirdDescription", label: "Descrição 3" },
-  ],
-  callToAction: [
-    { key: "title", label: "Título" }, { key: "description", label: "Descrição" },
-    { key: "label", label: "Botão" }, { key: "href", label: "Link" },
-    { key: "appearance", label: "Aparência", options: options("default", "inverted", "gradient") },
+  card: [
+    { key: "surface", label: "Fundo", options: options("transparent", "card", "muted", "contrast") },
+    { key: "padding", label: "Preenchimento", options: options("sm", "md", "lg") },
+    { key: "radius", label: "Bordas", options: options("none", "sm", "md", "lg") },
+    { key: "border", label: "Contorno", options: options("none", "subtle") },
+    { key: "shadow", label: "Sombra", options: options("none", "sm", "md") },
   ],
 }

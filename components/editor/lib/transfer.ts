@@ -20,12 +20,11 @@ const IMPORTABLE_BLOCK_TYPES = [
   "youtube",
   "pageCollection",
   "button",
-  "featureGrid",
-  "callToAction",
   "section",
   "columns",
   "column",
   "stack",
+  "card",
 ] as const
 
 export const editorDocumentJsonSchema = {
@@ -41,7 +40,7 @@ export const editorDocumentJsonSchema = {
       type: { enum: IMPORTABLE_BLOCK_TYPES },
       props: {
         type: "object",
-        description: "Propriedades do bloco. section controla largura, fundo, espaçamento e alinhamento; stack controla direção e distribuição; columns controla proporção e responsividade; heading usa level.",
+        description: "Propriedades do bloco. section controla largura e fundo; stack controla direção; columns controla proporção; card controla superfície, preenchimento, borda e sombra; heading usa level.",
       },
       content: {
         description: "Texto rico em array, por exemplo [{ type: 'text', text: 'Olá', styles: { bold: true } }]. Blocos youtube, divider e pageCollection não usam conteúdo.",

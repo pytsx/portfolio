@@ -27,6 +27,14 @@ export type PageStackProperties = {
   wrap: boolean
 }
 
+export type PageCardProperties = {
+  surface: "transparent" | "card" | "muted" | "contrast"
+  padding: "sm" | "md" | "lg"
+  radius: "none" | "sm" | "md" | "lg"
+  border: "none" | "subtle"
+  shadow: "none" | "sm" | "md"
+}
+
 const WIDTH_CLASSES: Record<PageSectionProperties["width"], string> = {
   narrow: "max-w-3xl",
   standard: "max-w-5xl",
@@ -95,6 +103,10 @@ export function PageStack({ properties, children, editor = false }: { properties
   return <div className="page-layout-stack" data-direction={properties.direction} data-gap={properties.gap} data-justify={properties.justify} data-align={properties.align} data-wrap={properties.wrap || undefined} data-editor-frame={editor || undefined}>
     {children}
   </div>
+}
+
+export function PageCard({ properties, children, editor = false }: { properties: PageCardProperties; children: ReactNode; editor?: boolean }) {
+  return <article className="page-layout-card" data-surface={properties.surface} data-padding={properties.padding} data-radius={properties.radius} data-border={properties.border} data-shadow={properties.shadow} data-editor-frame={editor || undefined}>{children}</article>
 }
 
 export function PageColumn({ children, editor = false }: { children: ReactNode; editor?: boolean }) {

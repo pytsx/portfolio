@@ -13,6 +13,7 @@ export function createEditorCollectionData(
     groups: groups.map((group) => ({
       id: group.id,
       title: group.title,
+      slug: group.slug,
       path: getGroupPath(group, groups),
     })),
     pages: pages.map((page) => {
@@ -26,6 +27,7 @@ export function createEditorCollectionData(
         visibility: page.visibility,
         isHome: page.isHome,
         groupId: page.groupId,
+        groupSlug: page.groupSlug,
       }
     }),
   }

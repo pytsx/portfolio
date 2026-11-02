@@ -7,14 +7,16 @@ import { groupRepository } from "@/lib/groups/server"
 import { Suspense } from "react"
 import { connection } from "next/server"
 import { AdminPageFallback } from "../../../_src/admin-page-fallback"
+import { createEditorCollectionData } from "@/lib/pages/editor-collections"
 
 async function EditPageContent({
   params,
 }: { params: Promise<{ id: string }> }) {
   await connection()
   const { id } = await params
-  const [page, groups] = await Promise.all([
+  const [page, pages, groups] = await Promise.all([
     pageRepository.get(id),
+    pageRepository.list(),
     groupRepository.list(),
   ])
 
@@ -25,6 +27,7 @@ async function EditPageContent({
       action={updatePage.bind(null, id)}
       page={page}
       groups={groups}
+      collections={createEditorCollectionData(pages, groups)}
     />
   )
 }

@@ -3,6 +3,7 @@ import { Eye, LayoutList, Star } from "lucide-react"
 
 import { usePageCollections } from "../components/page-collection-context"
 import { commonBlockProps } from "../component-registry"
+import { pageBelongsToCollection } from "../../../lib/pages/collection-membership"
 
 const DISPLAY_MODES = ["database", "preview"] as const
 const VISIBILITY_FILTERS = ["all", "public", "private"] as const
@@ -39,7 +40,7 @@ function PageCollectionBlockView({
   const selectedGroup = groups.find((group) => group.id === groupId)
   const query = block.props.query.trim().toLocaleLowerCase("pt-BR")
   const filteredPages = pages
-    .filter((page) => !groupId || page.groupId === groupId)
+    .filter((page) => pageBelongsToCollection(page, groupId, groups))
     .filter((page) => block.props.visibility === "all" || page.visibility === block.props.visibility)
     .filter((page) => !block.props.homeOnly || page.isHome)
     .filter((page) => !query || page.title.toLocaleLowerCase("pt-BR").includes(query))

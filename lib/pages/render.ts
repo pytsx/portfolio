@@ -5,6 +5,7 @@ import type { EditorDocument } from "@/components/editor/editor-types"
 import { publicGroups } from "@/lib/groups"
 import { getPublicGroupPath } from "@/lib/public/publication"
 import { publicPages } from "@/lib/pages"
+import { pageBelongsToCollection } from "./collection-membership"
 
 export async function resolvePageCollections(
   document: EditorDocument,
@@ -36,7 +37,7 @@ export async function resolvePageCollections(
         const query = (block.props?.query ?? "").trim().toLocaleLowerCase("pt-BR")
         const limit = Math.max(1, Math.min(block.props?.limit ?? 6, 50))
         const items = allPages
-          .filter((page) => !groupId || page.groupId === groupId)
+          .filter((page) => pageBelongsToCollection(page, groupId ?? "", groups))
           .filter((page) => !page.groupId || Boolean(groupPaths.get(page.groupId)))
           .filter((page) => block.props?.visibility === "all" || page.visibility === block.props?.visibility)
           .filter((page) => !block.props?.homeOnly || page.isHome)

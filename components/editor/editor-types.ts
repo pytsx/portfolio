@@ -10,11 +10,13 @@ export type EditorCollectionPage = {
   visibility: "public" | "private"
   isHome: boolean
   groupId?: string
+  groupSlug?: string
 }
 
 export type EditorCollectionGroup = {
   id: string
   title: string
+  slug: string
   path: string
 }
 

@@ -3,7 +3,7 @@
 import { useActionState, useState, useRef, useCallback } from "react"
 import { Globe2, Lock, Save } from "lucide-react"
 
-import { Editor, type EditorDocument } from "@/components/editor"
+import { Editor, type EditorCollectionData, type EditorDocument } from "@/components/editor"
 import { Button } from "@/components/ui/button"
 import {
   INITIAL_MUTATION_STATE,
@@ -27,10 +27,11 @@ type PageComposerProps = {
   action: PageMutation
   page?: ContentPage
   groups: PageGroup[]
+  collections: EditorCollectionData
   defaultGroupId?: string
 }
 
-export function PageComposer({ action, page, groups, defaultGroupId }: PageComposerProps) {
+export function PageComposer({ action, page, groups, collections, defaultGroupId }: PageComposerProps) {
   const [content, setContent] = useState<EditorDocument>(page?.content ?? [])
   const documentRef = useRef(content)
   const updateDocument = useCallback((document: EditorDocument) => { documentRef.current = document }, [])
@@ -162,6 +163,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           pageWidth={pageWidth}
           pageId={page?.id}
           pageTitle={page?.title}
+          collections={collections}
         />
       </main>
     </form>

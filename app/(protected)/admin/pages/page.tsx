@@ -9,6 +9,7 @@ import { groupRepository } from "@/lib/groups/server"
 import { getGroupPath } from "@/lib/groups/tree"
 import { PageComposer } from "./_src/page-composer"
 import { createPage } from "./actions"
+import { createEditorCollectionData } from "@/lib/pages/editor-collections"
 
 function getPagePath(page: Awaited<ReturnType<typeof pageRepository.list>>[number], groups: Awaited<ReturnType<typeof groupRepository.list>>) {
   const group = groups.find((candidate) =>
@@ -30,7 +31,7 @@ async function PagesContent({
   ])
 
   if (shouldCreate === "1") {
-    return <PageComposer action={createPage} groups={groups} defaultGroupId={groupId} />
+    return <PageComposer action={createPage} groups={groups} collections={createEditorCollectionData(allPages, groups)} defaultGroupId={groupId} />
   }
 
   return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { syntaxHighlighter } from "@blocknote/code-block"
 import { pt } from "@blocknote/core/locales"
 import { useCreateBlockNote } from "@blocknote/react"
@@ -92,6 +92,13 @@ export function EditorClient({
       : undefined,
   })
 
+  const keepBlockSelected = useCallback((blockId: string) => {
+    const block = editor.getBlock(blockId)
+    if (!block) return
+    setSelectedBlock(block)
+    selectFromEditor(block.id)
+  }, [editor, selectFromEditor])
+
   const updateSelectedBlock = useCallback(() => {
     const selectionBlock = editor.getSelection()?.blocks[0]
     if (selectionBlock) {
@@ -109,6 +116,20 @@ export function EditorClient({
       selectFromEditor(undefined)
     }
   }, [editor, selectFromEditor])
+
+  const selectLayoutFromPointer = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
+    const target = event.target
+    if (!(target instanceof HTMLElement)) return
+    const layout = target.closest<HTMLElement>(".page-layout-section, .page-layout-columns, .page-layout-column, .page-layout-stack")
+    if (!layout) return
+
+    const layoutBlock = layout.closest<HTMLElement>("[data-node-type=\"blockContainer\"][data-id]")
+    const nearestBlock = target.closest<HTMLElement>("[data-node-type=\"blockContainer\"][data-id]")
+    if (!layoutBlock?.dataset.id || (nearestBlock && nearestBlock !== layoutBlock)) return
+
+    event.preventDefault()
+    keepBlockSelected(layoutBlock.dataset.id)
+  }, [keepBlockSelected])
 
   useEffect(() => {
     if (!autoFocus || !editable) return
@@ -180,7 +201,7 @@ export function EditorClient({
               ))}
             </div>
           ) : null}
-          <div className="editor-canvas" data-viewport={viewport}>
+          <div className="editor-canvas" data-viewport={viewport} onPointerDownCapture={selectLayoutFromPointer}>
             <div className="page-width-frame" data-page-width={pageWidth}>
               <BlockNoteView
               editor={editor}
@@ -198,7 +219,6 @@ export function EditorClient({
                 lastEmittedDocumentRef.current = document
                 onChangeRef.current(document)
                 if (pageId && mode === "builder") publishPage(pageId, pageTitle, document)
-                updateSelectedBlock()
               }}
             >
               {editable ? <EditorSlashMenu editor={editor} /> : null}
@@ -206,7 +226,7 @@ export function EditorClient({
             </div>
           </div>
         </div>
-        {mode === "builder" && editable ? <BlockInspector block={selectedBlock} editor={editor} /> : null}
+        {mode === "builder" && editable ? <BlockInspector block={selectedBlock} editor={editor} onKeepSelection={keepBlockSelected} /> : null}
       </div>
     </PageCollectionProvider>
   )

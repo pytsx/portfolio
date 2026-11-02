@@ -12,7 +12,7 @@ function getProperty(block: NonNullable<SelectedBlock>, key: string) {
   return String((block.props as Record<string, unknown>)[key] ?? "")
 }
 
-export function BlockInspector({ block, editor }: { block: SelectedBlock; editor: EditorInstance }) {
+export function BlockInspector({ block, editor, onKeepSelection }: { block: SelectedBlock; editor: EditorInstance; onKeepSelection: (blockId: string) => void }) {
   const schema: Record<string, { default: unknown; values?: readonly (string | number | boolean)[] }> = block ? editorSchema.blockSchema[block.type].propSchema : {}
   const fields: PropertyField[] | undefined = block ? INSPECTOR_FIELDS[block.type] ?? Object.entries(schema).map(([key, definition]) => ({
     key, label: propertyLabels[key] ?? key,
@@ -25,6 +25,7 @@ export function BlockInspector({ block, editor }: { block: SelectedBlock; editor
     const parsed = typeof definition?.default === "number" ? Number(value) : typeof definition?.default === "boolean" ? value === "true" : value
     if (typeof parsed === "number" && !Number.isFinite(parsed)) return
     editor.updateBlock(block.id, { props: { [key]: parsed } })
+    queueMicrotask(() => onKeepSelection(block.id))
   }
 
   return (

@@ -92,7 +92,10 @@ export function PageColumns({ properties, children, editor = false }: { properti
 }
 
 export function PageStack({ properties, children, editor = false }: { properties: PageStackProperties; children: ReactNode; editor?: boolean }) {
-  return <div className="page-layout-stack" data-direction={properties.direction} data-gap={properties.gap} data-justify={properties.justify} data-align={properties.align} data-wrap={properties.wrap || undefined} data-editor-frame={editor || undefined}>{children}</div>
+  return <div className="page-layout-stack" data-direction={properties.direction} data-gap={properties.gap} data-justify={properties.justify} data-align={properties.align} data-wrap={properties.wrap || undefined} data-editor-frame={editor || undefined}>
+    {editor ? <button type="button" className="page-layout-select-handle" aria-label="Selecionar pilha">Pilha</button> : null}
+    {children}
+  </div>
 }
 
 export function PageColumn({ children, editor = false }: { children: ReactNode; editor?: boolean }) {

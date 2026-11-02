@@ -21,9 +21,16 @@ export function readFormBoolean(formData: FormData, key: string) {
 export function readFormJson(formData: FormData, key: string): unknown {
   const value = readFormString(formData, key)
 
+  if (new TextEncoder().encode(value).byteLength > MAX_JSON_FORM_BYTES) {
+    throw new EntityValidationError("O conteúdo enviado excede o limite permitido.")
+  }
+
   try {
     return JSON.parse(value)
   } catch {
     return undefined
   }
 }
+import { EntityValidationError } from "@/lib/entities/errors"
+
+const MAX_JSON_FORM_BYTES = 256 * 1024

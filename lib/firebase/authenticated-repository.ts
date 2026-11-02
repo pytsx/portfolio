@@ -38,11 +38,12 @@ async function requireDatabase(): Promise<{ db: Firestore; userId: string }> {
 }
 
 function requireDocumentId(id: string) {
-  if (!id.trim()) {
+  const normalizedId = id.trim()
+  if (!normalizedId || normalizedId.length > 256 || normalizedId.includes("/")) {
     throw new EntityNotFoundError("Identificador do registro não informado.")
   }
 
-  return id
+  return normalizedId
 }
 
 export function createAuthenticatedRepository<Entity, CreateInput, UpdateInput>(

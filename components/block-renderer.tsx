@@ -10,8 +10,10 @@ import {
   PageStack,
   type PageColumnsProperties,
   type PageCardProperties,
+  type PageColumnProperties,
   type PageSectionProperties,
   type PageStackProperties,
+  type StructureBoxProperties,
 } from "./editor/components/page-layouts"
 import type { EditorDocument } from "./editor/editor-types"
 import "./editor/editor.css"
@@ -200,22 +202,31 @@ function YouTubeBlock({ props }: { props: Record<string, unknown> }) {
   )
 }
 
+function asStructureBoxProperties(props: Record<string, unknown>, defaults: Partial<StructureBoxProperties> = {}): StructureBoxProperties {
+  return {
+    surface: props.surface === "card" || props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : defaults.surface ?? "transparent",
+    padding: props.padding === "sm" || props.padding === "md" || props.padding === "lg" || props.padding === "xl" ? props.padding : defaults.padding ?? "none",
+    radius: props.radius === "sm" || props.radius === "md" || props.radius === "lg" ? props.radius : defaults.radius ?? "none",
+    border: props.border === "subtle" || props.border === "strong" ? props.border : defaults.border ?? "none",
+    shadow: props.shadow === "sm" || props.shadow === "md" ? props.shadow : defaults.shadow ?? "none",
+    minHeight: props.minHeight === "sm" || props.minHeight === "md" || props.minHeight === "lg" || props.minHeight === "screen" ? props.minHeight : defaults.minHeight ?? "auto",
+    contentAlignment: props.contentAlignment === "center" || props.contentAlignment === "right" ? props.contentAlignment : defaults.contentAlignment ?? "left",
+    verticalAlignment: props.verticalAlignment === "center" || props.verticalAlignment === "end" ? props.verticalAlignment : defaults.verticalAlignment ?? "start",
+  }
+}
+
 function asSectionProperties(props: Record<string, unknown>): PageSectionProperties {
   return {
+    ...asStructureBoxProperties(props, { padding: "lg" }),
     width: props.width === "narrow" || props.width === "standard" || props.width === "full" ? props.width : "wide",
-    surface: props.surface === "card" || props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : "transparent",
-    spacing: props.spacing === "sm" || props.spacing === "md" || props.spacing === "xl" ? props.spacing : "lg",
-    radius: props.radius === "sm" || props.radius === "md" || props.radius === "lg" ? props.radius : "none",
     anchor: typeof props.anchor === "string" ? props.anchor : "",
     effect: props.effect === "fade" || props.effect === "slide" ? props.effect : "none",
-    contentAlignment: props.contentAlignment === "center" || props.contentAlignment === "right" ? props.contentAlignment : "left",
-    verticalAlignment: props.verticalAlignment === "center" || props.verticalAlignment === "end" ? props.verticalAlignment : "start",
-    minHeight: props.minHeight === "large" || props.minHeight === "screen" ? props.minHeight : "auto",
   }
 }
 
 function asColumnsProperties(props: Record<string, unknown>): PageColumnsProperties {
   return {
+    ...asStructureBoxProperties(props),
     distribution: props.distribution === "sidebar-left" || props.distribution === "sidebar-right" ? props.distribution : "equal",
     gap: props.gap === "none" || props.gap === "sm" || props.gap === "lg" || props.gap === "xl" ? props.gap : "md",
     mobile: props.mobile === "scroll" ? "scroll" : "stack",
@@ -225,6 +236,7 @@ function asColumnsProperties(props: Record<string, unknown>): PageColumnsPropert
 
 function asStackProperties(props: Record<string, unknown>): PageStackProperties {
   return {
+    ...asStructureBoxProperties(props),
     direction: props.direction === "row" ? "row" : "column",
     gap: props.gap === "none" || props.gap === "sm" || props.gap === "lg" || props.gap === "xl" ? props.gap : "md",
     justify: props.justify === "center" || props.justify === "end" || props.justify === "between" ? props.justify : "start",
@@ -234,14 +246,10 @@ function asStackProperties(props: Record<string, unknown>): PageStackProperties 
 }
 
 function asCardProperties(props: Record<string, unknown>): PageCardProperties {
-  return {
-    surface: props.surface === "transparent" || props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : "card",
-    padding: props.padding === "sm" || props.padding === "lg" ? props.padding : "md",
-    radius: props.radius === "none" || props.radius === "sm" || props.radius === "lg" ? props.radius : "md",
-    border: props.border === "none" ? "none" : "subtle",
-    shadow: props.shadow === "none" || props.shadow === "md" ? props.shadow : "sm",
-  }
+  return asStructureBoxProperties(props, { surface: "card", padding: "md", radius: "md", border: "subtle", shadow: "sm" })
 }
+
+function asColumnProperties(props: Record<string, unknown>): PageColumnProperties { return asStructureBoxProperties(props) }
 
 type BlockProps = { block: EditorDocument[number]; collections: Record<string, BlockCollectionItem[]>; path: string }
 
@@ -315,7 +323,7 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
     case "columns":
       return <PageColumns properties={asColumnsProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumns>
     case "column":
-      return <PageColumn><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumn>
+      return <PageColumn properties={asColumnProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumn>
     case "stack":
       return <PageStack properties={asStackProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageStack>
     case "card":

@@ -60,11 +60,11 @@ describe("public block renderer", () => {
       }],
     }])
 
-    expect(html).toContain('class="page-layout-section')
+    expect(html).toContain("page-layout-section")
     expect(html).toContain('data-content-alignment="center"')
     expect(html).toContain('data-min-height="screen"')
-    expect(html).toContain('class="page-layout-stack"')
-    expect(html).toContain('class="page-layout-card"')
+    expect(html).toContain("page-layout-stack")
+    expect(html).toContain("page-layout-card")
     expect(html).toContain('data-shadow="md"')
     expect(html).toContain('href="/contato"')
   })

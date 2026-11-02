@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { commonBlockProps, columnsDefinition, sectionDefinition, stackDefinition, structureAppearanceProps, structureFlowProps } from "./component-registry"
+import { commonBlockProps, columnsDefinition, sectionDefinition, stackDefinition, structureBoxProps, structureFlowProps } from "./component-registry"
 import { editorSchema } from "./editor-schema"
 import { getBlockFamily, getInspectorSections } from "./inspector-registry"
 
@@ -10,8 +10,8 @@ describe("property system", () => {
     expect(stackDefinition.propSchema.align).toBe(structureFlowProps.align)
     expect(columnsDefinition.propSchema.gap).toBe(structureFlowProps.gap)
     expect(columnsDefinition.propSchema.align).toBe(structureFlowProps.align)
-    expect(sectionDefinition.propSchema.surface).toBe(structureAppearanceProps.surface)
-    expect(sectionDefinition.propSchema.radius).toBe(structureAppearanceProps.radius)
+    expect(sectionDefinition.propSchema.surface).toBe(structureBoxProps.surface)
+    expect(sectionDefinition.propSchema.radius).toBe(structureBoxProps.radius)
   })
 
   it("gives every custom block the shared common properties", () => {
@@ -22,6 +22,13 @@ describe("property system", () => {
       expect(schema).toHaveProperty("textAlignment")
     }
     expect(stackDefinition.propSchema.textAlignment).toBe(commonBlockProps.textAlignment)
+  })
+
+  it("gives every structure block the complete shared box capabilities", () => {
+    for (const blockType of ["section", "columns", "column", "stack", "card"] as const) {
+      const schema = editorSchema.blockSchema[blockType].propSchema
+      for (const property of Object.keys(structureBoxProps)) expect(schema).toHaveProperty(property)
+    }
   })
 
   it("groups every real schema property exactly once", () => {
@@ -35,9 +42,10 @@ describe("property system", () => {
   })
 
   it("aligns native blocks with common and specific property groups", () => {
-    const sections = getInspectorSections(editorSchema.blockSchema.heading.propSchema)
+    const sections = getInspectorSections(editorSchema.blockSchema.heading.propSchema, { editableContent: true })
     expect(sections.find((section) => section.id === "common")?.fields.map((field) => field.key)).toEqual(["textAlignment", "textColor", "backgroundColor"])
     expect(sections.find((section) => section.id === "typography")?.fields.map((field) => field.key)).toEqual(expect.arrayContaining(["level"]))
+    expect(sections.find((section) => section.id === "typography")?.fields.map((field) => field.key)).toContain("$content")
     expect(getBlockFamily("heading")).toBe("Texto")
     expect(getBlockFamily("card")).toBe("Estrutura")
   })

@@ -40,10 +40,10 @@ export function migrateLegacyLayoutBlock(block: LegacyBlock): EditorDocument[num
       props: {
         width: "wide",
         surface: props.appearance === "muted" ? "muted" : props.appearance === "default" ? "transparent" : "gradient",
-        spacing: props.spacing === "sm" ? "md" : props.spacing === "md" ? "lg" : "xl",
+        padding: props.spacing === "sm" ? "md" : props.spacing === "md" ? "lg" : "xl",
         radius: props.radius === "md" ? "md" : props.radius === "none" ? "none" : "lg",
         contentAlignment: props.alignment === "center" ? "center" : "left",
-        verticalAlignment: "center", minHeight: "large",
+        verticalAlignment: "center", minHeight: "lg",
       },
       children: migrateChildren(block.children),
     } as EditorDocument[number]
@@ -68,8 +68,8 @@ export function migrateLegacyLayoutBlock(block: LegacyBlock): EditorDocument[num
       props: {
         width: "wide",
         surface: props.appearance === "muted" ? "muted" : props.appearance === "default" ? "transparent" : "gradient",
-        spacing: "xl", radius: "lg", contentAlignment: alignment,
-        verticalAlignment: "center", minHeight: "large",
+        padding: "xl", radius: "lg", contentAlignment: alignment,
+        verticalAlignment: "center", minHeight: "lg",
       },
       children: [{
         type: "stack",
@@ -77,6 +77,11 @@ export function migrateLegacyLayoutBlock(block: LegacyBlock): EditorDocument[num
         children: content,
       }],
     } as EditorDocument[number]
+  }
+
+  if (block.type === "section" && (props.spacing || props.minHeight === "large")) {
+    const { spacing, ...remainingProps } = props
+    return { ...block, props: { ...remainingProps, ...(spacing && !props.padding ? { padding: spacing } : {}), ...(props.minHeight === "large" ? { minHeight: "lg" } : {}) }, children: block.children === undefined ? undefined : migrateChildren(block.children) } as EditorDocument[number]
   }
 
   return { ...block, children: block.children === undefined ? undefined : migrateChildren(block.children) } as EditorDocument[number]

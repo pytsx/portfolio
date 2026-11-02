@@ -9,15 +9,28 @@ type SelectedBlock = ReturnType<EditorInstance["getBlock"]>
 type PropertySchema = Record<string, { default: unknown; type?: "string" | "number" | "boolean"; values?: readonly (string | number | boolean)[] }>
 
 function propertyValue(block: NonNullable<SelectedBlock>, key: string) {
+  if (key === "$content") {
+    const content = (block as { content?: unknown }).content
+    if (typeof content === "string") return content
+    if (!Array.isArray(content)) return ""
+    return content.map((item) => typeof item === "string" ? item : item && typeof item === "object" && "text" in item && typeof item.text === "string" ? item.text : "").join("")
+  }
   return (block.props as Record<string, unknown>)[key]
 }
 
 export function BlockInspector({ block, editor, onKeepSelection }: { block: SelectedBlock; editor: EditorInstance; onKeepSelection: (blockId: string) => void }) {
   const schema: PropertySchema = block ? editorSchema.blockSchema[block.type].propSchema : {}
-  const sections = block ? getInspectorSections(schema) : []
+  const content = block ? (block as { content?: unknown }).content : undefined
+  const editableContent = typeof content === "string" || Array.isArray(content)
+  const sections = block ? getInspectorSections(schema, { editableContent }) : []
 
   function updateProperty(field: PropertyField, value: unknown) {
     if (!block) return
+    if (field.key === "$content") {
+      editor.updateBlock(block.id, { content: String(value ?? "") })
+      queueMicrotask(() => onKeepSelection(block.id))
+      return
+    }
     const parsed = value === undefined ? undefined : field.kind === "number" ? Number(value) : field.kind === "boolean" ? Boolean(value) : value
     if (field.kind === "number" && parsed !== undefined && !Number.isFinite(parsed)) return
     editor.updateBlock(block.id, { props: { [field.key]: parsed } })
@@ -50,7 +63,7 @@ export function BlockInspector({ block, editor, onKeepSelection }: { block: Sele
               <div className="editor-inspector-fields">
                 {section.fields.map((field) => {
                   const value = propertyValue(block, field.key)
-                  const changed = value !== field.defaultValue
+                  const changed = field.key !== "$content" && value !== field.defaultValue
                   return (
                     <div className="editor-property-row" key={field.key}>
                       <div className="editor-property-label">
@@ -63,6 +76,8 @@ export function BlockInspector({ block, editor, onKeepSelection }: { block: Sele
                         </select>
                       ) : field.kind === "boolean" ? (
                         <button id={`${block.id}-${field.key}`} type="button" role="switch" aria-checked={Boolean(value)} className="editor-property-switch" onClick={() => updateProperty(field, !Boolean(value))}><span /></button>
+                      ) : field.kind === "textarea" ? (
+                        <textarea id={`${block.id}-${field.key}`} rows={3} value={String(value ?? "")} onChange={(event) => updateProperty(field, event.currentTarget.value)} />
                       ) : (
                         <input id={`${block.id}-${field.key}`} type={field.kind} value={String(value ?? "")} onChange={(event) => updateProperty(field, event.currentTarget.value)} />
                       )}

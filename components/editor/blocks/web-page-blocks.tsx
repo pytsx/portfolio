@@ -33,7 +33,7 @@ function featureCard(title: string, description: string): EditorDocument[number]
 export function createFeatureGridTemplate(content: FeatureGridContent = {}): EditorDocument[number] {
   return {
     type: "section",
-    props: { width: "wide", surface: "transparent", spacing: "lg", radius: "none", contentAlignment: "left", verticalAlignment: "start", minHeight: "auto" },
+    props: { width: "wide", surface: "transparent", padding: "lg", radius: "none", contentAlignment: "left", verticalAlignment: "start", minHeight: "auto" },
     children: [{
       type: "stack",
       props: { direction: "column", gap: "lg", justify: "start", align: "stretch", wrap: false },
@@ -65,7 +65,7 @@ export function createCallToActionTemplate(content: CallToActionContent = {}): E
   const surface = content.appearance === "inverted" ? "contrast" : content.appearance === "default" ? "muted" : "gradient"
   return {
     type: "section",
-    props: { width: "wide", surface, spacing: "lg", radius: "lg", contentAlignment: "left", verticalAlignment: "center", minHeight: "auto" },
+    props: { width: "wide", surface, padding: "lg", radius: "lg", contentAlignment: "left", verticalAlignment: "center", minHeight: "auto" },
     children: [{
       type: "columns",
       props: { distribution: "sidebar-right", gap: "lg", mobile: "stack", align: "center" },

@@ -3,9 +3,15 @@ import { defaultProps } from "@blocknote/core"
 export const commonBlockProps = defaultProps
 
 /** Schema fragments inherited by blocks in the same family. */
-export const structureAppearanceProps = {
+export const structureBoxProps = {
   surface: { default: "transparent", values: ["transparent", "card", "muted", "contrast", "gradient"] as const },
+  padding: { default: "none", values: ["none", "sm", "md", "lg", "xl"] as const },
   radius: { default: "none", values: ["none", "sm", "md", "lg"] as const },
+  border: { default: "none", values: ["none", "subtle", "strong"] as const },
+  shadow: { default: "none", values: ["none", "sm", "md"] as const },
+  minHeight: { default: "auto", values: ["auto", "sm", "md", "lg", "screen"] as const },
+  contentAlignment: { default: "left", values: ["left", "center", "right"] as const },
+  verticalAlignment: { default: "start", values: ["start", "center", "end"] as const },
 } as const
 
 export const structureFlowProps = {
@@ -28,6 +34,7 @@ export const stackDefinition = {
   description: "Agrupe e alinhe textos, botões, imagens e outros blocos",
   propSchema: {
     ...commonBlockProps,
+    ...structureBoxProps,
     ...structureFlowProps,
     direction: { default: "column", values: ["column", "row"] as const },
     justify: { default: "start", values: ["start", "center", "end", "between"] as const },
@@ -40,12 +47,12 @@ export const cardDefinition = {
   description: "Container reutilizável para agrupar conteúdo",
   propSchema: {
     ...commonBlockProps,
-    ...structureAppearanceProps,
-    surface: { ...structureAppearanceProps.surface, default: "card" },
-    radius: { ...structureAppearanceProps.radius, default: "md" },
-    padding: { default: "md", values: ["sm", "md", "lg"] as const },
-    border: { default: "subtle", values: ["none", "subtle"] as const },
-    shadow: { default: "sm", values: ["none", "sm", "md"] as const },
+    ...structureBoxProps,
+    surface: { ...structureBoxProps.surface, default: "card" },
+    radius: { ...structureBoxProps.radius, default: "md" },
+    padding: { ...structureBoxProps.padding, default: "md" },
+    border: { ...structureBoxProps.border, default: "subtle" },
+    shadow: { ...structureBoxProps.shadow, default: "sm" },
   },
 } as const
 
@@ -53,14 +60,11 @@ export const sectionDefinition = {
   title: "Seção",
   propSchema: {
     ...commonBlockProps,
-    ...structureAppearanceProps,
+    ...structureBoxProps,
+    padding: { ...structureBoxProps.padding, default: "lg" },
     width: { default: "wide", values: ["narrow", "standard", "wide", "full"] as const },
-    spacing: { default: "lg", values: ["sm", "md", "lg", "xl"] as const },
     anchor: { default: "" },
     effect: { default: "none", values: ["none", "fade", "slide"] as const },
-    contentAlignment: { default: "left", values: ["left", "center", "right"] as const },
-    verticalAlignment: { default: "start", values: ["start", "center", "end"] as const },
-    minHeight: { default: "auto", values: ["auto", "large", "screen"] as const },
   },
 } as const
 
@@ -68,6 +72,7 @@ export const columnsDefinition = {
   title: "Colunas",
   propSchema: {
     ...commonBlockProps,
+    ...structureBoxProps,
     ...structureFlowProps,
     distribution: { default: "equal", values: ["equal", "sidebar-left", "sidebar-right"] as const },
     mobile: { default: "stack", values: ["stack", "scroll"] as const },

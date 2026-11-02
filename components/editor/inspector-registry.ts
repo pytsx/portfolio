@@ -6,7 +6,7 @@ export type PropertyField = {
   label: string
   description?: string
   defaultValue: unknown
-  kind: "text" | "number" | "boolean" | "select"
+  kind: "text" | "textarea" | "number" | "boolean" | "select"
   options?: PropertyOption[]
 }
 
@@ -22,7 +22,6 @@ const PROPERTY_META: Record<string, { label: string; description?: string }> = {
   backgroundColor: { label: "Cor de fundo" },
   width: { label: "Largura" },
   surface: { label: "Superfície" },
-  spacing: { label: "Espaçamento externo" },
   padding: { label: "Preenchimento" },
   radius: { label: "Raio" },
   border: { label: "Contorno" },
@@ -60,6 +59,7 @@ const PROPERTY_META: Record<string, { label: string; description?: string }> = {
   tone: { label: "Tom" },
   start: { label: "Início da numeração" },
   isToggleable: { label: "Recolhível" },
+  $content: { label: "Conteúdo", description: "A edição pelo painel aplica texto simples ao bloco" },
 }
 
 const OPTION_LABELS: Record<string, string> = {
@@ -76,6 +76,7 @@ const OPTION_LABELS: Record<string, string> = {
   narrow: "Estreita", standard: "Padrão", wide: "Larga", full: "Total",
   auto: "Automática", large: "Grande", screen: "Tela inteira",
   sm: "Pequeno", md: "Médio", lg: "Grande", xl: "Extra grande",
+  strong: "Forte", subtle: "Sutil",
   gray: "Cinza", brown: "Marrom", red: "Vermelho", orange: "Laranja", yellow: "Amarelo",
   green: "Verde", blue: "Azul", purple: "Roxo", pink: "Rosa",
 }
@@ -87,7 +88,7 @@ const PROPERTY_OPTION_VALUES: Record<string, readonly string[]> = {
 
 const SECTION_DEFINITIONS = [
   { id: "common", label: "Comum", keys: ["textAlignment", "textColor", "backgroundColor"] },
-  { id: "structure", label: "Estrutura", keys: ["width", "surface", "spacing", "padding", "radius", "border", "shadow", "direction", "distribution", "gap", "justify", "align", "wrap", "contentAlignment", "verticalAlignment", "minHeight", "mobile"] },
+  { id: "structure", label: "Estrutura", keys: ["width", "surface", "padding", "radius", "border", "shadow", "direction", "distribution", "gap", "justify", "align", "wrap", "contentAlignment", "verticalAlignment", "minHeight", "mobile"] },
   { id: "typography", label: "Tipografia e texto", keys: ["level", "checked", "language", "start", "isToggleable"] },
   { id: "media", label: "Mídia", keys: ["url", "name", "caption", "showPreview", "previewWidth"] },
   { id: "link", label: "Link", keys: ["href", "variant"] },
@@ -120,7 +121,7 @@ export function getBlockFamily(blockType: string) {
   return BLOCK_FAMILIES[blockType] ?? "Bloco"
 }
 
-export function getInspectorSections(schema: Record<string, SchemaProperty>): PropertySection[] {
+export function getInspectorSections(schema: Record<string, SchemaProperty>, options: { editableContent?: boolean } = {}): PropertySection[] {
   const remaining = new Set(Object.keys(schema))
   const sections: PropertySection[] = SECTION_DEFINITIONS.flatMap((section) => {
     const fields = section.keys.filter((key) => remaining.delete(key)).map((key) => fieldFromSchema(key, schema[key]))
@@ -128,5 +129,11 @@ export function getInspectorSections(schema: Record<string, SchemaProperty>): Pr
   })
   const specific = [...remaining].map((key) => fieldFromSchema(key, schema[key]))
   if (specific.length > 0) sections.push({ id: "specific", label: "Específico do bloco", fields: specific })
+  if (options.editableContent) {
+    const field: PropertyField = { key: "$content", label: PROPERTY_META.$content.label, description: PROPERTY_META.$content.description, defaultValue: "", kind: "textarea" }
+    const typography = sections.find((section) => section.id === "typography")
+    if (typography) typography.fields.unshift(field)
+    else sections.unshift({ id: "typography", label: "Tipografia e texto", fields: [field] })
+  }
   return sections
 }

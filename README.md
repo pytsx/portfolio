@@ -12,6 +12,7 @@ Um portfólio construído com Next.js e Firebase no qual a estrutura pública é
 - Importação e exportação de documentos JSON, além de schema para uso com LLMs.
 - Dados públicos cacheados com Cache Components e cache remoto em deploys compatíveis com Vercel.
 - Área administrativa protegida por proxy, cookie `HttpOnly` e allowlist de administradores.
+- Recursos para agentes em `/llms.txt` e `/ai-catalog.json`, com catálogo adicional em `/.well-known/ai-catalog.json`.
 
 ## Stack
 

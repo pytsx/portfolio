@@ -1,5 +1,4 @@
 import { Appbar } from "./_src/appbar";
-import { Welcome } from "./_src/welcome";
 import { Menu } from "./_src/menu";
 import { menus } from "@/lib/menu";
 import { Separator } from "@/components/ui/separator";
@@ -13,8 +12,6 @@ async function getPublicLayoutData() {
   const [[menu], settings] = await Promise.all([menus.list(), publicSiteSettings.get()])
   return { menu: menu?.items ?? [], settings }
 }
-
-
 async function PublicNavigation() {
   const { menu, settings } = await getPublicLayoutData()
 
@@ -35,7 +32,6 @@ async function PublicFooter() {
 export default function PublicLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-svh flex-col">
-      <Suspense fallback={null}><PublicWelcome /></Suspense>
       <Suspense fallback={<Appbar><div></div></Appbar>}>
         <PublicNavigation />
       </Suspense>
@@ -50,7 +46,3 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
   )
 }
 
-async function PublicWelcome() {
-  const settings = await publicSiteSettings.get()
-  return <Welcome name={settings.name} />
-}

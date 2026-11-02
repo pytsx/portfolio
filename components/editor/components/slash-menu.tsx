@@ -9,6 +9,7 @@ import {
 import { Columns3, FileStack, FileVideoCamera, LayoutPanelTop, Lightbulb, PanelsTopLeft, Send, SquareDashed } from "lucide-react"
 
 import type { editorSchema } from "../editor-schema"
+import { heroDefinition, heroPreset, buttonDefinition } from "../component-registry"
 
 type EditorInstance = typeof editorSchema.BlockNoteEditor
 
@@ -20,6 +21,17 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
         filterSuggestionItems(
           [
             ...getDefaultReactSlashMenuItems(editor),
+            {
+              title: heroDefinition.title, subtext: heroDefinition.description,
+              aliases: ["hero", "capa", "editável"], group: "Página web",
+              icon: <LayoutPanelTop className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, heroPreset()),
+            },
+            {
+              title: buttonDefinition.title, aliases: ["button", "link"], group: "Página web",
+              icon: <Send className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "button", content: "Saiba mais" }),
+            },
             {
               title: "Seção",
               subtext: "Agrupe blocos com largura, fundo e espaçamento",

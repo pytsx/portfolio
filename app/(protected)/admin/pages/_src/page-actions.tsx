@@ -22,6 +22,7 @@ import {
 
 type PageActionsProps = {
   content: EditorDocument
+  getContent?: () => EditorDocument
   fileName: string
   onImport(document: EditorDocument): void
   entityId?: string
@@ -55,6 +56,7 @@ function downloadJson({ content, fileName }: Pick<PageActionsProps, "content" | 
 
 export function PageActions({
   content,
+  getContent,
   fileName,
   onImport,
   entityId,
@@ -113,7 +115,7 @@ export function PageActions({
             <DropdownMenuItem onClick={() => inputRef.current?.click()}>
               <FileUp /> Importar JSON
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => downloadJson({ content, fileName })}>
+            <DropdownMenuItem onClick={() => downloadJson({ content: getContent?.() ?? content, fileName })}>
               <Download /> Exportar JSON
             </DropdownMenuItem>
             {deleteAction && entityId ? (

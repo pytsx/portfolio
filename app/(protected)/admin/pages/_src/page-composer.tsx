@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useState } from "react"
+import { useActionState, useState, useRef, useCallback } from "react"
 import { Globe2, Lock, Save } from "lucide-react"
 
 import { Editor, type EditorDocument } from "@/components/editor"
@@ -32,17 +32,26 @@ type PageComposerProps = {
 
 export function PageComposer({ action, page, groups, defaultGroupId }: PageComposerProps) {
   const [content, setContent] = useState<EditorDocument>(page?.content ?? [])
+  const documentRef = useRef(content)
+  const updateDocument = useCallback((document: EditorDocument) => { documentRef.current = document }, [])
+  const getDocument = useCallback(() => documentRef.current, [])
+  function importDocument(document: EditorDocument) {
+    documentRef.current = document
+    setContent(document)
+  }
   const [visibility, setVisibility] = useState(page?.visibility ?? "public")
   const [isHome, setIsHome] = useState(page?.isHome ?? false)
   const [pageWidth, setPageWidth] = useState(() => parsePageWidth(page?.width))
   const [state, formAction, pending] = useActionState(
-    action,
+    (previous: MutationState, data: FormData) => {
+      data.set("content", JSON.stringify(documentRef.current))
+      return action(previous, data)
+    },
     INITIAL_MUTATION_STATE,
   )
 
   return (
     <form action={formAction} className="min-h-[calc(100vh-4.5rem)]">
-      <input type="hidden" name="content" value={JSON.stringify(content)} />
       <input type="hidden" name="width" value={pageWidth} />
       {isHome ? <input type="hidden" name="isHome" value="on" /> : null}
 
@@ -73,8 +82,9 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
         />
         <PageActions
           content={content}
+          getContent={getDocument}
           fileName={page?.slug ?? "nova-pagina"}
-          onImport={setContent}
+          onImport={importDocument}
           entityId={page?.id}
           deleteAction={page ? deletePage : undefined}
         />
@@ -145,7 +155,7 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
 
         <Editor
           value={content}
-          onChange={setContent}
+          onChange={updateDocument}
           placeholder="Digite / para escolher um bloco"
           autoFocus={Boolean(page)}
           mode="builder"

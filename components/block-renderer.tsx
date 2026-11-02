@@ -1,5 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
+import type { CSSProperties } from "react"
+import { ComposedHero } from "./editor/components/composed-hero"
 
 import {
   CallToActionSection,
@@ -197,13 +199,30 @@ function asColumnsProperties(props: Record<string, unknown>): PageColumnsPropert
   }
 }
 
-function Block({ block: sourceBlock, collections, path }: { block: EditorDocument[number]; collections: Record<string, BlockCollectionItem[]>; path: string }) {
+type BlockProps = { block: EditorDocument[number]; collections: Record<string, BlockCollectionItem[]>; path: string }
+
+function Block(props: BlockProps) {
+  const properties = asRenderableBlock(props.block).props ?? {}
+  const alignment = properties.textAlignment
+  const style: CSSProperties = {
+    textAlign: alignment === "left" || alignment === "center" || alignment === "right" || alignment === "justify" ? alignment : undefined,
+    color: typeof properties.textColor === "string" && properties.textColor !== "default" ? properties.textColor : undefined,
+    backgroundColor: typeof properties.backgroundColor === "string" && properties.backgroundColor !== "default" ? properties.backgroundColor : undefined,
+  }
+  return <div style={style}><BlockContent {...props} /></div>
+}
+
+function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
   const block = asRenderableBlock(sourceBlock)
   const props = block.props ?? {}
   const content = <InlineText content={block.content} />
   const blockKey = getBlockKey(sourceBlock, path)
 
   switch (block.type) {
+    case "heroLayout":
+      return <ComposedHero props={props}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></ComposedHero>
+    case "button":
+      return <a className="builder-button" data-variant={props.variant ?? "primary"} href={typeof props.href === "string" ? getSafeHref(props.href) : undefined}>{content}</a>
     case "heading": {
       const level = props.level === 1 || props.level === 2 ? props.level : 3
       const Heading = `h${level}` as "h1" | "h2" | "h3"

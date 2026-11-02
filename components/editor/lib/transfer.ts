@@ -19,6 +19,8 @@ const IMPORTABLE_BLOCK_TYPES = [
   "youtube",
   "pageCollection",
   "hero",
+  "heroLayout",
+  "button",
   "featureGrid",
   "callToAction",
   "section",

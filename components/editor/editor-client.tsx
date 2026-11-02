@@ -131,7 +131,7 @@ export function EditorClient({
   useEffect(() => {
     if (!pageId || sidebarPage?.pageId !== pageId || !selectionRequest) return
     if (!editor.getBlock(selectionRequest.blockId)) return
-    editor.setSelection(selectionRequest.blockId, selectionRequest.blockId)
+    editor.setTextCursorPosition(selectionRequest.blockId, "start")
     editor.focus()
     queueMicrotask(updateSelectedBlock)
   }, [editor, pageId, selectionRequest, sidebarPage?.pageId, updateSelectedBlock])

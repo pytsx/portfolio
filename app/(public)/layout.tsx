@@ -39,7 +39,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
         <PublicNavigation />
       </Suspense>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 md:px-4 px-2">{children}</main>
       <Separator className="mb-4" />
 
       <Suspense fallback={<footer className="p-5" />}>

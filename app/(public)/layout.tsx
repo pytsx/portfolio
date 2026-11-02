@@ -6,6 +6,7 @@ import { Footer } from "./_src/footer";
 import { Suspense } from "react";
 import { publicSocials } from "@/lib/socials";
 import { publicSiteSettings } from "@/lib/site-settings";
+import { connection } from "next/server";
 
 
 async function getPublicLayoutData() {
@@ -13,6 +14,7 @@ async function getPublicLayoutData() {
   return { menu: menu?.items ?? [], settings }
 }
 async function PublicNavigation() {
+  await connection()
   const { menu, settings } = await getPublicLayoutData()
 
   return (
@@ -24,6 +26,7 @@ async function PublicNavigation() {
 }
 
 async function PublicFooter() {
+  await connection()
   const [socials, settings] = await Promise.all([publicSocials.list(), publicSiteSettings.get()])
 
   return <Footer logo={<div>{settings.logo || settings.name}</div>} socials={socials} />

@@ -7,6 +7,7 @@ import { getEditorDocumentText } from "@/components/editor/lib/document"
 import { resolvePageCollections } from "@/lib/pages/render"
 import { resolvePublicRoute } from "@/lib/public/route-resolver"
 import { absoluteUrl } from "@/lib/public/url"
+import { connection } from "next/server"
 
 type Props = { params: Promise<{ path: string[] }> }
 
@@ -39,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 async function ResolvedContent({ params }: Props) {
+  await connection()
   const { path } = await params
   const resolved = await resolvePublicRoute(path.join("/"))
   if (!resolved) notFound()

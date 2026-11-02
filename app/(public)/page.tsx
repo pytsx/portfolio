@@ -8,6 +8,7 @@ import { resolvePageCollections } from "@/lib/pages/render"
 import type { Metadata } from "next"
 import { publicSiteSettings } from "@/lib/site-settings"
 import { absoluteUrl } from "@/lib/public/url"
+import { connection } from "next/server"
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await publicSiteSettings.get()
@@ -19,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 async function HomeContent() {
+  await connection()
   const [page, group] = await Promise.all([
     publicPages.getMain(),
     publicGroups.getMain(),

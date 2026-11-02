@@ -45,4 +45,3 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
     </div>
   )
 }
-

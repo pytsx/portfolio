@@ -129,6 +129,28 @@
   min-height: 0;
 }
 
+.portfolio-editor [data-editor-selected="true"] {
+  position: relative;
+  isolation: isolate;
+  border-radius: 0.625rem;
+}
+
+.portfolio-editor [data-editor-selected="true"]::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  inset: -3px;
+  pointer-events: none;
+  border: 2px solid transparent;
+  border-radius: 0.75rem;
+  background: linear-gradient(120deg, oklch(0.7 0.2 290), oklch(0.72 0.2 340), oklch(0.75 0.16 210)) border-box;
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--background) 70%, transparent), 0 5px 18px -10px oklch(0.7 0.2 290 / 55%);
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
 .editor-workspace[data-mode="builder"] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 18rem;

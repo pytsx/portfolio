@@ -26,6 +26,12 @@ type EditorInstance = typeof editorSchema.BlockNoteEditor
 type SelectedBlock = ReturnType<EditorInstance["getBlock"]>
 type BuilderViewport = "desktop" | "tablet" | "mobile"
 
+function findEditorBlockElement(root: HTMLElement | undefined, blockId: string) {
+  const matches = Array.from(root?.querySelectorAll<HTMLElement>("[data-id]") ?? [])
+    .filter((element) => element.dataset.id === blockId)
+  return matches.find((element) => element.dataset.nodeType === "blockContainer") ?? matches[0]
+}
+
 export function EditorClient({
   value,
   onChange,
@@ -137,8 +143,7 @@ export function EditorClient({
       setSelectedBlock(block)
       selectFromEditor(block.id)
 
-      const blockElement = Array.from(editor.domElement?.querySelectorAll<HTMLElement>("[data-id]") ?? [])
-        .find((element) => element.dataset.id === block.id)
+      const blockElement = findEditorBlockElement(editor.domElement, block.id)
       blockElement?.scrollIntoView({ behavior: "smooth", block: "center" })
 
       if (block.content !== undefined) {
@@ -147,6 +152,19 @@ export function EditorClient({
       }
     })
   }, [editor, pageId, selectFromEditor, selectionRequest, sidebarPage?.pageId])
+
+  useEffect(() => {
+    const root = editor.domElement
+    root?.querySelectorAll<HTMLElement>("[data-editor-selected]").forEach((element) => {
+      delete element.dataset.editorSelected
+    })
+    if (!selectedBlock) return
+
+    const element = findEditorBlockElement(root, selectedBlock.id)
+    if (!element) return
+    element.dataset.editorSelected = "true"
+    return () => { delete element.dataset.editorSelected }
+  }, [editor, selectedBlock])
 
   return (
     <PageCollectionProvider collections={collections}>

@@ -1,13 +1,13 @@
 import Link from "next/link"
 import Image from "next/image"
-import type { CSSProperties } from "react"
+import type { ReactNode } from "react"
 
 import {
   CallToActionSection,
   FeatureGridSection,
   type CallToActionSectionProps,
   type FeatureGridSectionProps,
-} from "@/components/editor/components/web-page-sections"
+} from "./editor/components/web-page-sections"
 import {
   PageColumn,
   PageColumns,
@@ -16,8 +16,8 @@ import {
   type PageColumnsProperties,
   type PageSectionProperties,
   type PageStackProperties,
-} from "@/components/editor/components/page-layouts"
-import type { EditorDocument } from "@/components/editor/editor-types"
+} from "./editor/components/page-layouts"
+import type { EditorDocument } from "./editor/editor-types"
 import "./editor/editor.css"
 
 export type BlockCollectionItem = {
@@ -46,6 +46,25 @@ type InlineContent = {
   href?: string
   content?: InlineContent[]
   styles?: Record<string, unknown>
+}
+
+type TableCell = {
+  type?: string
+  props?: Record<string, unknown>
+  content?: unknown
+}
+
+type TableContent = {
+  rows?: Array<{ cells?: Array<TableCell | unknown> }>
+  columnWidths?: Array<number | undefined>
+  headerRows?: number
+  headerCols?: number
+}
+
+const BLOCKNOTE_COLORS = new Set(["gray", "brown", "red", "orange", "yellow", "green", "blue", "purple", "pink"])
+
+function blockNoteColor(value: unknown) {
+  return typeof value === "string" && BLOCKNOTE_COLORS.has(value) ? value : undefined
 }
 
 function asRenderableBlock(block: EditorDocument[number]): RenderableBlock {
@@ -82,7 +101,7 @@ function InlineText({ content }: { content: unknown }) {
     <>
       {asInlineContent(content).map((item, index) => {
         const styles = item.styles ?? {}
-        let value: React.ReactNode = <InlineText content={item.content ?? item.text} />
+        let value: ReactNode = <InlineText content={item.content ?? item.text} />
 
         if (styles.bold) value = <strong>{value}</strong>
         if (styles.italic) value = <em>{value}</em>
@@ -90,14 +109,57 @@ function InlineText({ content }: { content: unknown }) {
         if (styles.strike) value = <s>{value}</s>
         if (styles.code) value = <code>{value}</code>
 
+        const textColor = blockNoteColor(styles.textColor)
+        const backgroundColor = blockNoteColor(styles.backgroundColor)
+        if (textColor || backgroundColor) {
+          value = <span data-text-color={textColor} data-background-color={backgroundColor}>{value}</span>
+        }
+
         const href = item.href ? getSafeHref(item.href) : undefined
         if (item.type === "link" && href) {
-          value = <a href={href}>{value}</a>
+          value = href.startsWith("/") ? <Link href={href} prefetch>{value}</Link> : <a href={href}>{value}</a>
         }
 
         return <span key={index}>{value}</span>
       })}
     </>
+  )
+}
+
+function plainText(content: unknown) {
+  if (typeof content === "string") return content
+  if (!Array.isArray(content)) return ""
+  return content.map((item) => typeof item === "string" ? item : item && typeof item === "object" && "text" in item && typeof item.text === "string" ? item.text : "").join("")
+}
+
+function TableBlock({ content }: { content: unknown }) {
+  if (!content || typeof content !== "object") return null
+  const table = content as TableContent
+  if (!Array.isArray(table.rows)) return null
+
+  return (
+    <div className="portfolio-table-wrapper">
+      <table>
+        {Array.isArray(table.columnWidths) ? <colgroup>{table.columnWidths.map((width, index) => <col key={index} style={typeof width === "number" ? { width } : undefined} />)}</colgroup> : null}
+        <tbody>
+          {table.rows.map((row, rowIndex) => <tr key={rowIndex}>
+            {(row.cells ?? []).map((sourceCell, columnIndex) => {
+              const cell = sourceCell && typeof sourceCell === "object" && "content" in sourceCell ? sourceCell as TableCell : { content: sourceCell }
+              const Cell = rowIndex < (table.headerRows ?? 0) || columnIndex < (table.headerCols ?? 0) ? "th" : "td"
+              const cellProps = cell.props ?? {}
+              return <Cell
+                key={columnIndex}
+                colSpan={typeof cellProps.colspan === "number" ? cellProps.colspan : undefined}
+                rowSpan={typeof cellProps.rowspan === "number" ? cellProps.rowspan : undefined}
+                data-text-alignment={typeof cellProps.textAlignment === "string" ? cellProps.textAlignment : undefined}
+                data-text-color={blockNoteColor(cellProps.textColor)}
+                data-background-color={blockNoteColor(cellProps.backgroundColor)}
+              ><InlineText content={cell.content} /></Cell>
+            })}
+          </tr>)}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
@@ -203,12 +265,18 @@ type BlockProps = { block: EditorDocument[number]; collections: Record<string, B
 function Block(props: BlockProps) {
   const properties = asRenderableBlock(props.block).props ?? {}
   const alignment = properties.textAlignment
-  const style: CSSProperties = {
-    textAlign: alignment === "left" || alignment === "center" || alignment === "right" || alignment === "justify" ? alignment : undefined,
-    color: typeof properties.textColor === "string" && properties.textColor !== "default" ? properties.textColor : undefined,
-    backgroundColor: typeof properties.backgroundColor === "string" && properties.backgroundColor !== "default" ? properties.backgroundColor : undefined,
-  }
-  return <div style={style}><BlockContent {...props} /></div>
+  const rendersOwnChildren = ["bulletListItem", "numberedListItem", "quote", "toggleListItem", "section", "columns", "column", "stack"].includes(props.block.type ?? "")
+  return <div
+    className="portfolio-block-content"
+    data-content-type={props.block.type}
+    data-level={props.block.type === "heading" && typeof properties.level === "number" ? properties.level : undefined}
+    data-text-alignment={alignment === "left" || alignment === "center" || alignment === "right" || alignment === "justify" ? alignment : undefined}
+    data-text-color={blockNoteColor(properties.textColor)}
+    data-background-color={blockNoteColor(properties.backgroundColor)}
+  >
+    <BlockContent {...props} />
+    {rendersOwnChildren ? null : <BlockChildren collections={props.collections} path={props.path}>{asRenderableBlock(props.block).children}</BlockChildren>}
+  </div>
 }
 
 function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
@@ -219,10 +287,14 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
 
   switch (block.type) {
     case "button":
-      return <a className="builder-button" data-variant={props.variant ?? "primary"} href={typeof props.href === "string" ? getSafeHref(props.href) : undefined}>{content}</a>
+      return typeof props.href === "string" && getSafeHref(props.href)?.startsWith("/")
+        ? <Link className="builder-button" data-variant={props.variant ?? "primary"} href={getSafeHref(props.href)!} prefetch>{content}</Link>
+        : <a className="builder-button" data-variant={props.variant ?? "primary"} href={typeof props.href === "string" ? getSafeHref(props.href) : undefined}>{content}</a>
+    case "paragraph":
+      return <p>{content}</p>
     case "heading": {
-      const level = props.level === 1 || props.level === 2 ? props.level : 3
-      const Heading = `h${level}` as "h1" | "h2" | "h3"
+      const level = typeof props.level === "number" && props.level >= 1 && props.level <= 6 ? props.level : 3
+      const Heading = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
       return <Heading><span>{content}</span></Heading>
     }
     case "bulletListItem":
@@ -234,19 +306,19 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
     case "quote":
       return <blockquote>{content}<BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></blockquote>
     case "codeBlock":
-      return <pre><code>{typeof props.code === "string" ? props.code : ""}</code></pre>
+      return <pre data-language={typeof props.language === "string" ? props.language : undefined}><code>{plainText(block.content)}</code></pre>
     case "divider":
       return <hr />
     case "image":
       return typeof props.url === "string" && getSafeHref(props.url)
-        ? <figure><Image src={getSafeHref(props.url)!} alt={typeof props.caption === "string" ? props.caption : ""} width={1200} height={675} sizes="(max-width: 768px) 100vw, 896px" className="h-auto w-full" /><figcaption>{typeof props.caption === "string" ? props.caption : ""}</figcaption></figure>
+        ? <figure className="portfolio-media"><Image src={getSafeHref(props.url)!} alt={typeof props.caption === "string" ? props.caption : ""} width={1200} height={675} sizes="(max-width: 768px) 100vw, 896px" style={typeof props.previewWidth === "number" ? { maxWidth: props.previewWidth } : undefined} />{props.caption ? <figcaption>{String(props.caption)}</figcaption> : null}</figure>
         : null
     case "video":
+      return typeof props.url === "string" && getSafeHref(props.url) ? <figure className="portfolio-media"><video controls src={getSafeHref(props.url)} style={typeof props.previewWidth === "number" ? { maxWidth: props.previewWidth } : undefined} />{props.caption ? <figcaption>{String(props.caption)}</figcaption> : null}</figure> : null
     case "audio":
+      return typeof props.url === "string" && getSafeHref(props.url) ? <figure className="portfolio-media"><audio controls src={getSafeHref(props.url)} />{props.caption ? <figcaption>{String(props.caption)}</figcaption> : null}</figure> : null
     case "file":
-      return typeof props.url === "string" && getSafeHref(props.url)
-        ? <a href={getSafeHref(props.url)}>{typeof props.name === "string" ? props.name : props.url}</a>
-        : null
+      return typeof props.url === "string" && getSafeHref(props.url) ? <a className="portfolio-file" href={getSafeHref(props.url)}>{typeof props.name === "string" && props.name ? props.name : props.url}{props.caption ? <small>{String(props.caption)}</small> : null}</a> : null
     case "callout":
       return <aside className="editor-callout" data-tone={typeof props.tone === "string" ? props.tone : "info"} role="note"><span className="editor-callout-icon">{typeof props.icon === "string" ? props.icon : "💡"}</span><div><InlineText content={block.content} /></div></aside>
     case "youtube":
@@ -257,6 +329,8 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
       return <CallToActionSection {...asCallToActionProps(props)} />
     case "toggleListItem":
       return <details><summary>{content}</summary><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></details>
+    case "table":
+      return <TableBlock content={block.content} />
     case "section":
       return <PageSection properties={asSectionProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageSection>
     case "columns":
@@ -268,7 +342,7 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
     case "pageCollection":
       return <PageCollection items={collections[blockKey] ?? []} layout={props.layout === "list" ? "list" : "grid"} />
     default:
-      return <div>{content}<BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></div>
+      return <div>{content}</div>
   }
 }
 
@@ -299,7 +373,7 @@ export async function BlockRenderer({
   collections = {},
 }: BlockRendererProps) {
   return (
-    <div className="portfolio-block-renderer space-y-6">
+    <div className="portfolio-block-renderer">
       {content.map((sourceBlock, index) => {
         const path = String(index)
         return <div key={getBlockKey(sourceBlock, path)} className="portfolio-block" data-block-type={sourceBlock.type}><Block block={sourceBlock} collections={collections} path={path} /></div>

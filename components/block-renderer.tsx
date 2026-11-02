@@ -203,9 +203,9 @@ function YouTubeBlock({ props }: { props: Record<string, unknown> }) {
 function asSectionProperties(props: Record<string, unknown>): PageSectionProperties {
   return {
     width: props.width === "narrow" || props.width === "standard" || props.width === "full" ? props.width : "wide",
-    surface: props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : "transparent",
+    surface: props.surface === "card" || props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : "transparent",
     spacing: props.spacing === "sm" || props.spacing === "md" || props.spacing === "xl" ? props.spacing : "lg",
-    radius: props.radius === "md" || props.radius === "lg" ? props.radius : "none",
+    radius: props.radius === "sm" || props.radius === "md" || props.radius === "lg" ? props.radius : "none",
     anchor: typeof props.anchor === "string" ? props.anchor : "",
     effect: props.effect === "fade" || props.effect === "slide" ? props.effect : "none",
     contentAlignment: props.contentAlignment === "center" || props.contentAlignment === "right" ? props.contentAlignment : "left",
@@ -217,7 +217,7 @@ function asSectionProperties(props: Record<string, unknown>): PageSectionPropert
 function asColumnsProperties(props: Record<string, unknown>): PageColumnsProperties {
   return {
     distribution: props.distribution === "sidebar-left" || props.distribution === "sidebar-right" ? props.distribution : "equal",
-    gap: props.gap === "sm" || props.gap === "lg" ? props.gap : "md",
+    gap: props.gap === "none" || props.gap === "sm" || props.gap === "lg" || props.gap === "xl" ? props.gap : "md",
     mobile: props.mobile === "scroll" ? "scroll" : "stack",
     align: props.align === "start" || props.align === "center" || props.align === "end" ? props.align : "stretch",
   }
@@ -235,7 +235,7 @@ function asStackProperties(props: Record<string, unknown>): PageStackProperties 
 
 function asCardProperties(props: Record<string, unknown>): PageCardProperties {
   return {
-    surface: props.surface === "transparent" || props.surface === "muted" || props.surface === "contrast" ? props.surface : "card",
+    surface: props.surface === "transparent" || props.surface === "muted" || props.surface === "contrast" || props.surface === "gradient" ? props.surface : "card",
     padding: props.padding === "sm" || props.padding === "lg" ? props.padding : "md",
     radius: props.radius === "none" || props.radius === "sm" || props.radius === "lg" ? props.radius : "md",
     border: props.border === "none" ? "none" : "subtle",

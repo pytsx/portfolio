@@ -2,6 +2,7 @@ import { createReactBlockSpec } from "@blocknote/react"
 import { Eye, LayoutList, Star } from "lucide-react"
 
 import { usePageCollections } from "../components/page-collection-context"
+import { commonBlockProps } from "../component-registry"
 
 const DISPLAY_MODES = ["database", "preview"] as const
 const VISIBILITY_FILTERS = ["all", "public", "private"] as const
@@ -102,6 +103,7 @@ export const pageCollectionBlock = createReactBlockSpec(
   {
     type: "pageCollection",
     propSchema: {
+      ...commonBlockProps,
       groupId: { default: "" },
       query: { default: "" },
       limit: { default: 6, type: "number" },

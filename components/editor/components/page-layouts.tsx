@@ -2,9 +2,9 @@ import type { ReactNode } from "react"
 
 export type PageSectionProperties = {
   width: "narrow" | "standard" | "wide" | "full"
-  surface: "transparent" | "muted" | "contrast" | "gradient"
+  surface: "transparent" | "card" | "muted" | "contrast" | "gradient"
   spacing: "sm" | "md" | "lg" | "xl"
-  radius: "none" | "md" | "lg"
+  radius: "none" | "sm" | "md" | "lg"
   anchor: string
   effect: "none" | "fade" | "slide"
   contentAlignment: "left" | "center" | "right"
@@ -14,7 +14,7 @@ export type PageSectionProperties = {
 
 export type PageColumnsProperties = {
   distribution: "equal" | "sidebar-left" | "sidebar-right"
-  gap: "sm" | "md" | "lg"
+  gap: "none" | "sm" | "md" | "lg" | "xl"
   mobile: "stack" | "scroll"
   align: "start" | "center" | "end" | "stretch"
 }
@@ -28,7 +28,7 @@ export type PageStackProperties = {
 }
 
 export type PageCardProperties = {
-  surface: "transparent" | "card" | "muted" | "contrast"
+  surface: "transparent" | "card" | "muted" | "contrast" | "gradient"
   padding: "sm" | "md" | "lg"
   radius: "none" | "sm" | "md" | "lg"
   border: "none" | "subtle"
@@ -51,12 +51,14 @@ const SPACING_CLASSES: Record<PageSectionProperties["spacing"], string> = {
 
 const RADIUS_CLASSES: Record<PageSectionProperties["radius"], string> = {
   none: "rounded-none",
+  sm: "rounded-lg",
   md: "rounded-2xl",
   lg: "rounded-[2rem]",
 }
 
 const SURFACE_CLASSES: Record<PageSectionProperties["surface"], string> = {
   transparent: "bg-transparent",
+  card: "bg-card text-card-foreground",
   muted: "bg-muted/60",
   contrast: "bg-foreground text-background",
   gradient: "bg-gradient-to-br from-primary/15 via-background to-muted/40 ring-1 ring-primary/15",

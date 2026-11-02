@@ -1,4 +1,5 @@
 import { createReactBlockSpec } from "@blocknote/react"
+import { commonBlockProps } from "../component-registry"
 
 const CALLOUT_TONES = ["info", "warning", "success", "danger"] as const
 
@@ -6,6 +7,7 @@ export const calloutBlock = createReactBlockSpec(
   {
     type: "callout",
     propSchema: {
+      ...commonBlockProps,
       icon: { default: "💡" },
       tone: {
         default: "info",

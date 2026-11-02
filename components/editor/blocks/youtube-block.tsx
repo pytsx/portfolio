@@ -1,4 +1,5 @@
 import { createReactBlockSpec } from "@blocknote/react"
+import { commonBlockProps } from "../component-registry"
 
 function getYouTubeVideoId(value: string): string | undefined {
   try {
@@ -20,6 +21,7 @@ export const youtubeBlock = createReactBlockSpec(
   {
     type: "youtube",
     propSchema: {
+      ...commonBlockProps,
       url: { default: "" },
       caption: { default: "" },
     },

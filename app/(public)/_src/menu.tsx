@@ -11,6 +11,10 @@ import {
 } from "@/components/ui/navigation-menu"
 import type { MenuDropdown, MenuEntry } from "@/lib/menu"
 
+function isInternalHref(href: string) {
+  return href.startsWith("/") && !href.startsWith("//")
+}
+
 function NavigationDropdown({ item }: { item: MenuDropdown }) {
   return (
     <NavigationMenuItem>
@@ -21,7 +25,7 @@ function NavigationDropdown({ item }: { item: MenuDropdown }) {
             <li key={dropdownItem.id}>
               <NavigationMenuLink
                 render={
-                  <Link href={dropdownItem.href}>
+                  <Link href={dropdownItem.href} prefetch={isInternalHref(dropdownItem.href)}>
                     <div className="flex flex-col gap-1 text-sm">
                       <div className="font-medium leading-none">
                         {dropdownItem.label}
@@ -54,7 +58,7 @@ export function Menu({ items }: { items: MenuEntry[] }) {
             <NavigationMenuItem key={item.id}>
               <NavigationMenuLink
                 className={navigationMenuTriggerStyle()}
-                render={<Link href={item.href}>{item.label}</Link>}
+                render={<Link href={item.href} prefetch={isInternalHref(item.href)}>{item.label}</Link>}
               />
             </NavigationMenuItem>
           ),

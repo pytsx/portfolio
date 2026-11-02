@@ -270,7 +270,7 @@ function PageCollection({
   return (
     <div className={layout === "grid" ? "grid gap-4 sm:grid-cols-2" : "grid gap-2"}>
       {items.map((item) => (
-        <Link key={item.id} href={item.href} className="rounded-2xl border p-5 text-lg font-medium transition-colors hover:bg-muted">
+        <Link key={item.id} href={item.href} prefetch className="rounded-2xl border p-5 text-lg font-medium transition-colors hover:bg-muted">
           {item.title}
         </Link>
       ))}

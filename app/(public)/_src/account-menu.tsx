@@ -34,9 +34,9 @@ export function AccountMenuClient({ user }: { user: SessionUser | null }) {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem render={<Link href="/admin" />}><LayoutDashboard /> Painel administrativo</DropdownMenuItem>
-          <DropdownMenuItem render={<Link href="/admin/pages?new=1" />}><FilePlus2 /> Nova página</DropdownMenuItem>
-          <DropdownMenuItem render={<Link href="/admin/settings" />}><Settings /> Configurações do portfólio</DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/admin" prefetch />}><LayoutDashboard /> Painel administrativo</DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/admin/pages?new=1" prefetch />}><FilePlus2 /> Nova página</DropdownMenuItem>
+          <DropdownMenuItem render={<Link href="/admin/settings" prefetch />}><Settings /> Configurações do portfólio</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" render={<Link href="/signout" />}>Sair</DropdownMenuItem>

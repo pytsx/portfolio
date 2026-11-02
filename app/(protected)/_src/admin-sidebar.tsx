@@ -22,8 +22,7 @@ import {
 } from "lucide-react"
 
 import type { AuthenticatedUser } from "@/lib/auth/server"
-import type { PageGroup } from "@/lib/groups"
-import type { ContentPage } from "@/lib/pages"
+import type { SidebarGroup as SidebarNavigationGroup, SidebarPage } from "@/lib/admin/navigation"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 import {
@@ -58,9 +57,9 @@ function matchesSearch(value: string, query: string) {
 }
 
 function isPageInParent(
-  page: ContentPage,
+  page: SidebarPage,
   parentId: string | undefined,
-  groups: PageGroup[]
+  groups: SidebarNavigationGroup[]
 ) {
   if (page.groupId) {
     return page.groupId === parentId
@@ -80,9 +79,9 @@ function isPageInParent(
 }
 
 function hasMatchingContent(
-  group: PageGroup,
-  groups: PageGroup[],
-  pages: ContentPage[],
+  group: SidebarNavigationGroup,
+  groups: SidebarNavigationGroup[],
+  pages: SidebarPage[],
   query: string,
   visited: Set<string> = new Set()
 ): boolean {
@@ -158,7 +157,7 @@ function ActionLink({
 // -------------------------------------------
 
 type TreePageItemProps = {
-  page: ContentPage
+  page: SidebarPage
   depth: number
   pathname: string
 }
@@ -216,9 +215,9 @@ function TreePageItem({
 // -------------------------------------------
 
 type TreeGroupItemProps = {
-  group: PageGroup
-  groups: PageGroup[]
-  pages: ContentPage[]
+  group: SidebarNavigationGroup
+  groups: SidebarNavigationGroup[]
+  pages: SidebarPage[]
   depth: number
   pathname: string
   query: string
@@ -372,8 +371,8 @@ function TreeGroupItem({
 // -------------------------------------------
 
 type ContentTreeProps = {
-  groups: PageGroup[]
-  pages: ContentPage[]
+  groups: SidebarNavigationGroup[]
+  pages: SidebarPage[]
   parentId?: string
   depth?: number
   pathname: string
@@ -465,8 +464,8 @@ function ContentTree({
 // -------------------------------------------
 
 type AdminSidebarProps = {
-  groups: PageGroup[]
-  pages: ContentPage[]
+  groups: SidebarNavigationGroup[]
+  pages: SidebarPage[]
   user: AuthenticatedUser
 }
 

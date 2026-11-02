@@ -5,16 +5,12 @@ import { connection } from "next/server"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { groupRepository } from "@/lib/groups/server"
-import { pageRepository } from "@/lib/pages/server"
+import { getAdminNavigation } from "@/lib/admin/navigation"
 import { AdminPageFallback } from "./_src/admin-page-fallback"
 
 async function AdminContent() {
   await connection()
-  const [pages, groups] = await Promise.all([
-    pageRepository.list(),
-    groupRepository.list(),
-  ])
+  const { pages, groups } = await getAdminNavigation()
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pt-8 pb-16 sm:px-8">

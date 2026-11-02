@@ -38,6 +38,8 @@ function validatePage(input: CreatePageInput): CreatePageInput {
     visibility: input.isHome ? "public" : input.visibility === "private" ? "private" : "public",
     isHome: input.isHome === true,
     width: parsePageWidth(input.width),
+    ...(input.description?.trim() ? { description: input.description.trim() } : {}),
+    ...(input.coverImage?.trim() ? { coverImage: input.coverImage.trim() } : {}),
     ...(input.groupSlug?.trim() ? { groupSlug: input.groupSlug.trim() } : {}),
     ...(input.groupId?.trim() ? { groupId: input.groupId.trim() } : {}),
   }

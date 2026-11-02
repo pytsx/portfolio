@@ -22,6 +22,8 @@ function readPageForm(formData: FormData) {
     groupId: readFormString(formData, "groupId") || undefined,
     isHome: readFormBoolean(formData, "isHome"),
     width: parsePageWidth(readFormString(formData, "width")),
+    description: readFormString(formData, "description") || undefined,
+    coverImage: readFormString(formData, "coverImage") || undefined,
   }
 }
 

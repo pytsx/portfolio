@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 import { Suspense, type ReactNode } from "react";
 import { connection } from "next/server";
 import { AdminSidebar } from "./_src/admin-sidebar";
-import { groupRepository } from "@/lib/groups/server";
-import { pageRepository } from "@/lib/pages/server";
+import { getAdminNavigation } from "@/lib/admin/navigation";
 
 export const metadata: Metadata = {
   title: "Administração | Henrique Pessoa",
@@ -15,10 +14,7 @@ export const metadata: Metadata = {
 async function AuthenticatedShell({ children }: { children: ReactNode }) {
   await connection()
   const user = await requireAuthenticatedUser()
-  const [groups, pages] = await Promise.all([
-    groupRepository.list(),
-    pageRepository.list(),
-  ])
+  const { groups, pages } = await getAdminNavigation()
 
   return (
     <SidebarProvider>

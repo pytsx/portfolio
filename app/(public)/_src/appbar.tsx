@@ -4,7 +4,7 @@ type AppbarProps = {
 }
 
 import { ThemeToggle } from "@/components/theme-toggle"
-import { AccountMenu } from "./account-menu"
+import { AccountMenu } from "./account-menu-server"
 
 export function Appbar(props: AppbarProps) {
   const { children } = props;

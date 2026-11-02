@@ -1,6 +1,6 @@
-import type { PageGroup } from "@/lib/groups"
+type GroupTreeItem = { id: string; slug: string; parentId?: string }
 
-export function getGroupPath(group: PageGroup, groups: PageGroup[]): string {
+export function getGroupPath<T extends GroupTreeItem>(group: T, groups: T[]): string {
   const segments = [group.slug]
   const visited = new Set([group.id])
   let parentId = group.parentId
@@ -17,6 +17,6 @@ export function getGroupPath(group: PageGroup, groups: PageGroup[]): string {
   return `/${segments.join("/")}`
 }
 
-export function getGroupDepth(group: PageGroup, groups: PageGroup[]): number {
+export function getGroupDepth<T extends GroupTreeItem>(group: T, groups: T[]): number {
   return getGroupPath(group, groups).split("/").filter(Boolean).length - 1
 }

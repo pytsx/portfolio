@@ -1,7 +1,7 @@
 import "server-only"
 
 import { cacheLife, cacheTag } from "next/cache"
-import { collection, getDocs, query, type DocumentData, where } from "firebase/firestore"
+import { collection, doc, getDoc, getDocs, query, type DocumentData, where } from "firebase/firestore"
 
 import { cacheTags } from "@/lib/cache-tags"
 import type { EditorDocument } from "@/components/editor/editor-types"
@@ -22,6 +22,8 @@ export type PageGroup = {
   createdAt?: Date
   updatedAt?: Date
 }
+
+export type PublicGroupIndexItem = Omit<PageGroup, "content">
 
 export type GroupInput = Pick<
   PageGroup,
@@ -55,6 +57,31 @@ async function listPublicGroups(): Promise<PageGroup[]> {
   return snapshot.docs.map((document) => groupFromDocument(document.id, document.data()))
 }
 
+async function listPublicGroupIndex(): Promise<PublicGroupIndexItem[]> {
+  "use cache: remote"
+  cacheLife("hours")
+  cacheTag(cacheTags.groups)
+
+  const snapshot = await getDocs(
+    query(collection(db, GROUPS_COLLECTION), where("visibility", "==", "public")),
+  )
+  return snapshot.docs.map((document) => {
+    const group = groupFromDocument(document.id, document.data())
+    return { id: group.id, title: group.title, slug: group.slug, visibility: group.visibility, isHome: group.isHome, parentId: group.parentId, createdAt: group.createdAt, updatedAt: group.updatedAt }
+  })
+}
+
+async function getPublicGroupById(id: string): Promise<PageGroup | null> {
+  "use cache: remote"
+  cacheLife("hours")
+  cacheTag(cacheTags.groups)
+
+  const snapshot = await getDoc(doc(db, GROUPS_COLLECTION, id))
+  if (!snapshot.exists()) return null
+  const group = groupFromDocument(snapshot.id, snapshot.data())
+  return group.visibility === "public" ? group : null
+}
+
 async function getPublicGroup(slug: string): Promise<PageGroup | null> {
   const groups = await listPublicGroups()
   return groups.find((group) => group.slug === slug) ?? null
@@ -62,6 +89,8 @@ async function getPublicGroup(slug: string): Promise<PageGroup | null> {
 
 export const publicGroups = {
   list: listPublicGroups,
+  listIndex: listPublicGroupIndex,
+  getById: getPublicGroupById,
   get: getPublicGroup,
   async getMain() {
     const groups = await listPublicGroups()

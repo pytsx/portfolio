@@ -1,12 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import { FilePlus2, LayoutDashboard, LogIn, Settings } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { getSessionUser } from "@/lib/auth/actions"
 
 type SessionUser = {
   id: string
@@ -17,24 +15,7 @@ function getUserInitial(user: SessionUser) {
   return (user.email ?? "U").charAt(0).toLocaleUpperCase("pt-BR")
 }
 
-export function AccountMenu() {
-  const [user, setUser] = useState<SessionUser | null>()
-
-  useEffect(() => {
-    let active = true
-    void getSessionUser().then((sessionUser) => {
-      if (active) setUser(sessionUser)
-    })
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  if (user === undefined) {
-    return <div className="size-8 animate-pulse rounded-full bg-muted" aria-label="Carregando usuário" />
-  }
-
+export function AccountMenuClient({ user }: { user: SessionUser | null }) {
   if (!user) {
     return <Button variant="ghost" size="sm" render={<Link href="/signin" />}><LogIn data-icon="inline-start" /> Entrar</Button>
   }

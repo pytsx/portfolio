@@ -121,6 +121,25 @@ export function PageComposer({ action, page, groups, defaultGroupId }: PageCompo
           />
           </div>
 
+          <div className="mb-10 grid gap-3 sm:grid-cols-2">
+            <input
+              name="description"
+              defaultValue={page?.description}
+              placeholder="Descrição para buscadores e compartilhamento"
+              aria-label="Descrição SEO"
+              maxLength={200}
+              className="rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <input
+              name="coverImage"
+              defaultValue={page?.coverImage}
+              placeholder="URL da imagem de compartilhamento"
+              aria-label="Imagem de compartilhamento"
+              type="url"
+              className="rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+
           {state.error ? <p role="alert" className="mb-6 text-sm text-destructive">{state.error}</p> : null}
         </div>
 

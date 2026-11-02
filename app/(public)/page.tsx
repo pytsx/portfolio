@@ -5,6 +5,18 @@ import { BlockPage } from "@/components/block-page"
 import { publicPages } from "@/lib/pages"
 import { publicGroups } from "@/lib/groups"
 import { resolvePageCollections } from "@/lib/pages/render"
+import type { Metadata } from "next"
+import { publicSiteSettings } from "@/lib/site-settings"
+import { absoluteUrl } from "@/lib/public/url"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await publicSiteSettings.get()
+  return {
+    title: settings.name,
+    description: settings.description,
+    alternates: { canonical: absoluteUrl("/") },
+  }
+}
 
 async function HomeContent() {
   const [page, group] = await Promise.all([

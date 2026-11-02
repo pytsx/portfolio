@@ -11,9 +11,15 @@ export async function resolvePageCollections(
   defaultGroupPath?: string,
   defaultGroupId?: string,
 ): Promise<Record<string, PageCollectionItem[]>> {
+  function hasPageCollection(blocks: EditorDocument): boolean {
+    return blocks.some((block) => block.type === "pageCollection" || (block.children?.length ? hasPageCollection(block.children) : false))
+  }
+
+  if (!hasPageCollection(document)) return {}
+
   const [allPages, groups] = await Promise.all([
-    publicPages.listAll(),
-    publicGroups.list(),
+    publicPages.listIndex(),
+    publicGroups.listIndex(),
   ])
   const groupPaths = new Map(
     groups.map((group) => [group.id, getGroupPath(group, groups)]),

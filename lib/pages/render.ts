@@ -36,10 +36,13 @@ export async function resolvePageCollections(
         const groupId = block.props?.groupId || defaultGroupId
         const query = (block.props?.query ?? "").trim().toLocaleLowerCase("pt-BR")
         const limit = Math.max(1, Math.min(block.props?.limit ?? 6, 50))
+        const visibility = block.props?.visibility === "public" || block.props?.visibility === "private"
+          ? block.props.visibility
+          : "all"
         const items = allPages
           .filter((page) => pageBelongsToCollection(page, groupId ?? "", groups))
           .filter((page) => !page.groupId || Boolean(groupPaths.get(page.groupId)))
-          .filter((page) => block.props?.visibility === "all" || page.visibility === block.props?.visibility)
+          .filter((page) => visibility === "all" || page.visibility === visibility)
           .filter((page) => !block.props?.homeOnly || page.isHome)
           .filter((page) => !query || page.title.toLocaleLowerCase("pt-BR").includes(query))
           .slice(0, limit)

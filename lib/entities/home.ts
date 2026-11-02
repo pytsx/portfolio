@@ -1,6 +1,6 @@
 import "server-only"
 
-import { collection, getDocs, query, where, writeBatch } from "firebase/firestore"
+import { collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore"
 
 import { getAuthenticatedContext } from "@/lib/auth/server"
 
@@ -23,7 +23,19 @@ export async function clearOtherHomeDocuments(
   ] as const) {
     snapshot.docs
       .filter((document) => !(currentCollection === collectionName && document.id === currentId))
-      .forEach((document) => batch.update(document.ref, { isHome: false }))
+      .forEach((document) => {
+        batch.update(document.ref, { isHome: false })
+
+        const publicIndex = collectionName === "groups"
+          ? "public-group-index"
+          : "public-page-index"
+        const indexReference = doc(context.db, publicIndex, document.id)
+        if (document.data().visibility === "private") {
+          batch.delete(indexReference)
+        } else {
+          batch.set(indexReference, { isHome: false }, { merge: true })
+        }
+      })
   }
 
   await batch.commit()

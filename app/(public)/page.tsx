@@ -13,7 +13,6 @@ import { connection } from "next/server"
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await publicSiteSettings.get()
   return {
-    title: settings.name,
     description: settings.description,
     alternates: { canonical: absoluteUrl("/") },
   }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useState } from "react"
+import { useActionState, useCallback, useRef, useState } from "react"
 import { Globe2, Lock, Save } from "lucide-react"
 
 import { Editor, type EditorCollectionData, type EditorDocument } from "@/components/editor"
@@ -22,13 +22,25 @@ type GroupComposerProps = {
 
 export function GroupComposer({ action, group, groups, defaultParentId, collections }: GroupComposerProps) {
   const [content, setContent] = useState<EditorDocument>(group?.content ?? [])
+  const documentRef = useRef(content)
+  const updateDocument = useCallback((document: EditorDocument) => { documentRef.current = document }, [])
+  const getDocument = useCallback(() => documentRef.current, [])
+  function importDocument(document: EditorDocument) {
+    documentRef.current = document
+    setContent(document)
+  }
   const [visibility, setVisibility] = useState(group?.visibility ?? "public")
   const [isHome, setIsHome] = useState(group?.isHome ?? false)
-  const [state, formAction, pending] = useActionState(action, INITIAL_MUTATION_STATE)
+  const [state, formAction, pending] = useActionState(
+    (previous: MutationState, data: FormData) => {
+      data.set("content", JSON.stringify(documentRef.current))
+      return action(previous, data)
+    },
+    INITIAL_MUTATION_STATE,
+  )
 
   return (
     <form action={formAction} className="min-h-[calc(100vh-4.5rem)]">
-      <input type="hidden" name="content" value={JSON.stringify(content)} />
       {isHome ? <input type="hidden" name="isHome" value="on" /> : null}
       <header className="sticky top-0 z-20 flex h-[69px] items-center justify-end gap-2 border-b bg-background/85 px-4 backdrop-blur-xl sm:px-8">
         <label className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -53,8 +65,9 @@ export function GroupComposer({ action, group, groups, defaultParentId, collecti
         />
         <PageActions
           content={content}
+          getContent={getDocument}
           fileName={group?.slug ?? "novo-grupo"}
-          onImport={setContent}
+          onImport={importDocument}
           entityId={group?.id}
           entityLabel="grupo"
           deleteAction={group ? deleteGroup : undefined}
@@ -103,8 +116,11 @@ export function GroupComposer({ action, group, groups, defaultParentId, collecti
         {state.error ? <p role="alert" className="mb-6 text-sm text-destructive">{state.error}</p> : null}
         <Editor
           value={content}
-          onChange={setContent}
+          onChange={updateDocument}
           collections={collections}
+          mode="builder"
+          pageId={group?.id}
+          pageTitle={group?.title}
           placeholder="Monte a listagem com blocos. Use /coleção para exibir páginas."
         />
       </main>

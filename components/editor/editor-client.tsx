@@ -130,11 +130,23 @@ export function EditorClient({
 
   useEffect(() => {
     if (!pageId || sidebarPage?.pageId !== pageId || !selectionRequest) return
-    if (!editor.getBlock(selectionRequest.blockId)) return
-    editor.setTextCursorPosition(selectionRequest.blockId, "start")
-    editor.focus()
-    queueMicrotask(updateSelectedBlock)
-  }, [editor, pageId, selectionRequest, sidebarPage?.pageId, updateSelectedBlock])
+    const block = editor.getBlock(selectionRequest.blockId)
+    if (!block) return
+
+    queueMicrotask(() => {
+      setSelectedBlock(block)
+      selectFromEditor(block.id)
+
+      const blockElement = Array.from(editor.domElement?.querySelectorAll<HTMLElement>("[data-id]") ?? [])
+        .find((element) => element.dataset.id === block.id)
+      blockElement?.scrollIntoView({ behavior: "smooth", block: "center" })
+
+      if (block.content !== undefined) {
+        editor.setTextCursorPosition(block.id, "start")
+        editor.focus()
+      }
+    })
+  }, [editor, pageId, selectFromEditor, selectionRequest, sidebarPage?.pageId])
 
   return (
     <PageCollectionProvider collections={collections}>

@@ -229,6 +229,7 @@ type TreeGroupItemProps = {
   showAll: boolean
   ancestors: Set<string>
   onOpenPage?: (pageId: string) => void
+  onOpenGroup?: (groupId: string) => void
 }
 
 function TreeGroupItem({
@@ -241,6 +242,7 @@ function TreeGroupItem({
   showAll,
   ancestors,
   onOpenPage,
+  onOpenGroup,
 }: TreeGroupItemProps) {
   const [open, setOpen] = React.useState(true)
 
@@ -302,6 +304,7 @@ function TreeGroupItem({
 
         <Link
           href={href}
+          onClick={() => onOpenGroup?.(group.id)}
           title={group.title}
           aria-current={active ? "page" : undefined}
           className="
@@ -368,6 +371,7 @@ function TreeGroupItem({
           showAll={showAll || groupMatches}
           ancestors={new Set([...ancestors, group.id])}
           onOpenPage={onOpenPage}
+          onOpenGroup={onOpenGroup}
         />
       )}
     </div>
@@ -388,6 +392,7 @@ type ContentTreeProps = {
   showAll?: boolean
   ancestors?: Set<string>
   onOpenPage?: (pageId: string) => void
+  onOpenGroup?: (groupId: string) => void
 }
 
 function ContentTree({
@@ -400,6 +405,7 @@ function ContentTree({
   showAll = false,
   ancestors = new Set<string>(),
   onOpenPage,
+  onOpenGroup,
 }: ContentTreeProps) {
   const childPages = pages.filter(
     (page) =>
@@ -465,6 +471,7 @@ function ContentTree({
           showAll={showAll}
           ancestors={ancestors}
           onOpenPage={onOpenPage}
+          onOpenGroup={onOpenGroup}
         />
       ))}
     </div>
@@ -529,11 +536,15 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const pathname = usePathname()
   const { page: pageStructure, selectedBlockId, selectFromSidebar } = usePageStructure()
-  const editorPageId = pathname.match(/^\/admin\/pages\/([^/]+)\/edit$/)?.[1]
+  const editorEntity = pathname.match(/^\/admin\/(pages|groups)\/([^/]+)\/edit$/)
+  const editorEntityType = editorEntity?.[1]
+  const editorPageId = editorEntity?.[2]
   const [pagesModeFor, setPagesModeFor] = React.useState<string>()
   const showPageLayers = Boolean(editorPageId && pagesModeFor !== editorPageId)
   const activePageStructure = pageStructure?.pageId === editorPageId ? pageStructure : undefined
-  const currentPageTitle = activePageStructure?.pageTitle ?? pages.find((page) => page.id === editorPageId)?.title ?? "Página"
+  const currentPageTitle = activePageStructure?.pageTitle
+    ?? (editorEntityType === "groups" ? groups.find((group) => group.id === editorPageId)?.title : pages.find((page) => page.id === editorPageId)?.title)
+    ?? "Página"
 
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [search, setSearch] = React.useState("")
@@ -753,6 +764,7 @@ export function AdminSidebar({
                 pathname={pathname}
                 query={query}
                 onOpenPage={() => setPagesModeFor(undefined)}
+                onOpenGroup={() => setPagesModeFor(undefined)}
               />
 
               {!query && (

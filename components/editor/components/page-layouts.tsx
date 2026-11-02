@@ -7,12 +7,24 @@ export type PageSectionProperties = {
   radius: "none" | "md" | "lg"
   anchor: string
   effect: "none" | "fade" | "slide"
+  contentAlignment: "left" | "center" | "right"
+  verticalAlignment: "start" | "center" | "end"
+  minHeight: "auto" | "large" | "screen"
 }
 
 export type PageColumnsProperties = {
   distribution: "equal" | "sidebar-left" | "sidebar-right"
   gap: "sm" | "md" | "lg"
   mobile: "stack" | "scroll"
+  align: "start" | "center" | "end" | "stretch"
+}
+
+export type PageStackProperties = {
+  direction: "column" | "row"
+  gap: "none" | "sm" | "md" | "lg" | "xl"
+  justify: "start" | "center" | "end" | "between"
+  align: "start" | "center" | "end" | "stretch"
+  wrap: boolean
 }
 
 const WIDTH_CLASSES: Record<PageSectionProperties["width"], string> = {
@@ -52,6 +64,9 @@ export function PageSection({ properties, children, editor = false }: { properti
       data-surface={properties.surface}
       data-width={properties.width}
       data-editor-frame={editor || undefined}
+      data-content-alignment={properties.contentAlignment}
+      data-vertical-alignment={properties.verticalAlignment}
+      data-min-height={properties.minHeight}
       className={`page-layout-section mx-auto w-full px-5 sm:px-8 ${WIDTH_CLASSES[properties.width]} ${SPACING_CLASSES[properties.spacing]}`}
     >
       <div className={`${SURFACE_CLASSES[properties.surface]} ${RADIUS_CLASSES[properties.radius]} ${properties.surface === "transparent" ? "" : "px-5 py-8 sm:px-10 sm:py-12"}`}>
@@ -68,11 +83,16 @@ export function PageColumns({ properties, children, editor = false }: { properti
       data-distribution={properties.distribution}
       data-gap={properties.gap}
       data-mobile={properties.mobile}
+      data-align={properties.align}
       data-editor-frame={editor || undefined}
     >
       {children}
     </div>
   )
+}
+
+export function PageStack({ properties, children, editor = false }: { properties: PageStackProperties; children: ReactNode; editor?: boolean }) {
+  return <div className="page-layout-stack" data-direction={properties.direction} data-gap={properties.gap} data-justify={properties.justify} data-align={properties.align} data-wrap={properties.wrap || undefined} data-editor-frame={editor || undefined}>{children}</div>
 }
 
 export function PageColumn({ children, editor = false }: { children: ReactNode; editor?: boolean }) {

@@ -8,9 +8,9 @@ import { codeBlockOptions } from "@blocknote/code-block"
 import { calloutBlock } from "./blocks/callout-block"
 import { youtubeBlock } from "./blocks/youtube-block"
 import { pageCollectionBlock } from "./blocks/page-collection-block"
-import { callToActionBlock, featureGridBlock, heroBlock } from "./blocks/web-page-blocks"
-import { columnBlock, columnsBlock, sectionBlock } from "./blocks/layout-blocks"
-import { composedHeroBlock, buttonBlock } from "./blocks/composed-hero-block"
+import { callToActionBlock, featureGridBlock } from "./blocks/web-page-blocks"
+import { columnBlock, columnsBlock, sectionBlock, stackBlock } from "./blocks/layout-blocks"
+import { buttonBlock } from "./blocks/button-block"
 
 export const editorSchema = BlockNoteSchema.create({
   blockSpecs: {
@@ -19,13 +19,12 @@ export const editorSchema = BlockNoteSchema.create({
     callout: calloutBlock,
     youtube: youtubeBlock,
     pageCollection: pageCollectionBlock,
-    hero: heroBlock,
-    heroLayout: composedHeroBlock,
     button: buttonBlock,
     featureGrid: featureGridBlock,
     callToAction: callToActionBlock,
     section: sectionBlock,
     columns: columnsBlock,
     column: columnBlock,
+    stack: stackBlock,
   },
 })

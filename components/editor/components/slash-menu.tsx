@@ -6,10 +6,10 @@ import {
   getDefaultReactSlashMenuItems,
   SuggestionMenuController,
 } from "@blocknote/react"
-import { Columns3, FileStack, FileVideoCamera, LayoutPanelTop, Lightbulb, PanelsTopLeft, Send, SquareDashed } from "lucide-react"
+import { AlignJustify, Columns3, FileStack, FileVideoCamera, Lightbulb, PanelsTopLeft, Send, SquareDashed } from "lucide-react"
 
 import type { editorSchema } from "../editor-schema"
-import { heroDefinition, heroPreset, buttonDefinition } from "../component-registry"
+import { buttonDefinition, stackDefinition } from "../component-registry"
 
 type EditorInstance = typeof editorSchema.BlockNoteEditor
 
@@ -21,12 +21,6 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
         filterSuggestionItems(
           [
             ...getDefaultReactSlashMenuItems(editor),
-            {
-              title: heroDefinition.title, subtext: heroDefinition.description,
-              aliases: ["hero", "capa", "editável"], group: "Página web",
-              icon: <LayoutPanelTop className="size-4" />,
-              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, heroPreset()),
-            },
             {
               title: buttonDefinition.title, aliases: ["button", "link"], group: "Página web",
               icon: <Send className="size-4" />,
@@ -40,6 +34,17 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
               icon: <SquareDashed className="size-4" />,
               onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, {
                 type: "section",
+                children: [{ type: "paragraph" }],
+              }),
+            },
+            {
+              title: stackDefinition.title,
+              subtext: stackDefinition.description,
+              aliases: ["pilha", "stack", "flex", "grupo", "alinhar"],
+              group: "Estrutura",
+              icon: <AlignJustify className="size-4" />,
+              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, {
+                type: "stack",
                 children: [{ type: "paragraph" }],
               }),
             },
@@ -71,14 +76,6 @@ export function EditorSlashMenu({ editor }: { editor: EditorInstance }) {
                   { type: "column", children: [{ type: "paragraph" }] },
                 ],
               }),
-            },
-            {
-              title: "Hero",
-              subtext: "Crie a abertura de uma página web",
-              aliases: ["hero", "capa", "abertura", "landing"],
-              group: "Página web",
-              icon: <LayoutPanelTop className="size-4" />,
-              onItemClick: () => insertOrUpdateBlockForSlashMenu(editor, { type: "hero" }),
             },
             {
               title: "Grade de destaques",

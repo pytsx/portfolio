@@ -1,5 +1,6 @@
 import type { EditorDocument } from "../editor-types"
 import deepEqual from "fast-deep-equal"
+import { migrateLegacyEditorValue } from "./legacy-layout-migration"
 
 export const EMPTY_EDITOR_DOCUMENT: EditorDocument = []
 
@@ -10,9 +11,10 @@ export function normalizeEditorDocument(
 }
 
 export function parseEditorDocument(value: unknown): EditorDocument {
-  if (!Array.isArray(value)) return []
+  const migrated = migrateLegacyEditorValue(value)
+  if (!Array.isArray(migrated)) return []
 
-  return value.filter(
+  return migrated.filter(
     (block): block is EditorDocument[number] =>
       typeof block === "object" && block !== null && "type" in block,
   )

@@ -18,18 +18,15 @@ export const inspectorFields: Record<string, PropertyField[]> = {
     { key: "radius", label: "Bordas", options: options("none", "md", "lg") },
     { key: "effect", label: "Efeito", options: options("none", "fade", "slide") },
     { key: "anchor", label: "Âncora" },
+    { key: "contentAlignment", label: "Conteúdo", options: options("left", "center", "right") },
+    { key: "verticalAlignment", label: "Vertical", options: options("start", "center", "end") },
+    { key: "minHeight", label: "Altura mínima", options: options("auto", "large", "screen") },
   ],
   columns: [
     { key: "distribution", label: "Proporção", options: options("equal", "sidebar-left", "sidebar-right") },
     { key: "gap", label: "Espaço", options: options("sm", "md", "lg") },
     { key: "mobile", label: "Mobile", options: options("stack", "scroll") },
-  ],
-  hero: [
-    { key: "eyebrow", label: "Etiqueta" }, { key: "title", label: "Título" }, { key: "description", label: "Descrição" },
-    { key: "primaryLabel", label: "Botão principal" }, { key: "primaryHref", label: "Link principal" },
-    { key: "secondaryLabel", label: "Botão secundário" }, { key: "secondaryHref", label: "Link secundário" },
-    { key: "alignment", label: "Alinhamento", options: options("left", "center") },
-    { key: "appearance", label: "Aparência", options: options("default", "muted", "gradient") },
+    { key: "align", label: "Alinhamento", options: options("start", "center", "end", "stretch") },
   ],
   featureGrid: [
     { key: "title", label: "Título" }, { key: "description", label: "Descrição" },

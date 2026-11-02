@@ -57,7 +57,7 @@ describe("editor document", () => {
   })
 
   it("extracts semantic content from visual-only blocks", () => {
-    const document: EditorDocument = [
+    const document = parseEditorDocument([
       {
         type: "hero",
         props: {
@@ -66,8 +66,9 @@ describe("editor document", () => {
           description: "Experiências rápidas e acessíveis.",
         },
       },
-    ]
+    ])
 
+    expect(document[0]?.type).toBe("section")
     expect(getEditorDocumentText(document)).toContain("Produtos digitais")
     expect(getEditorDocumentText(document)).toContain("Experiências rápidas")
   })

@@ -7,19 +7,6 @@ type SectionActionProps = {
   preview?: boolean
 }
 
-export type HeroSectionProps = {
-  eyebrow: string
-  title: string
-  description: string
-  primaryLabel: string
-  primaryHref: string
-  secondaryLabel: string
-  secondaryHref: string
-  alignment: "left" | "center"
-  appearance: "default" | "muted" | "gradient"
-  preview?: boolean
-}
-
 export type FeatureGridSectionProps = {
   title: string
   description: string
@@ -51,40 +38,6 @@ function SectionAction({ href, label, muted = false, preview = false }: SectionA
   if (preview) return <span className={className}>{label}{muted ? null : <ArrowRight className="size-4" />}</span>
 
   return <a href={href || "#"} className={className}>{label}{muted ? null : <ArrowRight className="size-4" />}</a>
-}
-
-export function HeroSection({
-  eyebrow,
-  title,
-  description,
-  primaryLabel,
-  primaryHref,
-  secondaryLabel,
-  secondaryHref,
-  alignment,
-  appearance,
-  preview,
-}: HeroSectionProps) {
-  const isCentered = alignment === "center"
-  const background = appearance === "gradient"
-    ? "border-primary/20 bg-gradient-to-br from-primary/15 via-background to-background"
-    : appearance === "muted" ? "bg-muted/60" : "border border-border bg-card"
-
-  return (
-    <section className={`page-web-section overflow-hidden rounded-3xl ${background} px-6 py-14 sm:px-12 sm:py-20`}>
-      <div className={`grid gap-6 ${isCentered ? "mx-auto max-w-3xl justify-items-center text-center" : "max-w-3xl"}`}>
-        {eyebrow ? <span className="rounded-full border border-border bg-background/60 px-3 py-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">{eyebrow}</span> : null}
-        <div className="grid gap-4">
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">{title || "Título da seção"}</h1>
-          {description ? <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">{description}</p> : null}
-        </div>
-        <div className={`flex flex-wrap gap-2 ${isCentered ? "justify-center" : ""}`}>
-          <SectionAction href={primaryHref} label={primaryLabel} preview={preview} />
-          <SectionAction href={secondaryHref} label={secondaryLabel} muted preview={preview} />
-        </div>
-      </div>
-    </section>
-  )
 }
 
 export function FeatureGridSection({

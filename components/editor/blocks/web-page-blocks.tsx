@@ -3,28 +3,11 @@ import { createReactBlockSpec } from "@blocknote/react"
 import {
   CallToActionSection,
   FeatureGridSection,
-  HeroSection,
   type CallToActionSectionProps,
   type FeatureGridSectionProps,
-  type HeroSectionProps,
 } from "../components/web-page-sections"
 
 type WebBlockProperties = Record<string, string>
-
-function asHeroProps(props: WebBlockProperties): HeroSectionProps {
-  return {
-    eyebrow: props.eyebrow ?? "",
-    title: props.title ?? "",
-    description: props.description ?? "",
-    primaryLabel: props.primaryLabel ?? "",
-    primaryHref: props.primaryHref ?? "",
-    secondaryLabel: props.secondaryLabel ?? "",
-    secondaryHref: props.secondaryHref ?? "",
-    alignment: props.alignment === "center" ? "center" : "left",
-    appearance: props.appearance === "gradient" ? "gradient" : props.appearance === "muted" ? "muted" : "default",
-    preview: true,
-  }
-}
 
 function asFeatureGridProps(props: WebBlockProperties): FeatureGridSectionProps {
   return {
@@ -50,11 +33,6 @@ function asCallToActionProps(props: WebBlockProperties): CallToActionSectionProp
     preview: true,
   }
 }
-
-export const heroBlock = createReactBlockSpec(
-  { type: "hero", propSchema: { eyebrow: { default: "Portfólio" }, title: { default: "Uma página feita para causar impacto" }, description: { default: "Transforme ideias em uma presença digital clara e memorável." }, primaryLabel: { default: "Começar" }, primaryHref: { default: "/" }, secondaryLabel: { default: "Saiba mais" }, secondaryHref: { default: "#" }, alignment: { default: "left", values: ["left", "center"] as const }, appearance: { default: "gradient", values: ["default", "muted", "gradient"] as const } }, content: "none" },
-  { render: ({ block }) => <div className="editor-web-block"><HeroSection {...asHeroProps(block.props)} /></div> },
-)()
 
 export const featureGridBlock = createReactBlockSpec(
   { type: "featureGrid", propSchema: { title: { default: "O que torna este trabalho especial" }, description: { default: "Apresente os diferenciais que sustentam a sua proposta." }, firstTitle: { default: "Estratégia" }, firstDescription: { default: "Decisões guiadas por contexto e objetivo." }, secondTitle: { default: "Design" }, secondDescription: { default: "Interfaces claras, expressivas e acessíveis." }, thirdTitle: { default: "Tecnologia" }, thirdDescription: { default: "Implementação sólida e preparada para evoluir." } }, content: "none" },

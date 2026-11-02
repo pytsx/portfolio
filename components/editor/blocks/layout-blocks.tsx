@@ -1,6 +1,7 @@
 import { createReactBlockSpec } from "@blocknote/react"
 
-import { PageColumn, PageColumns, PageSection } from "../components/page-layouts"
+import { PageColumn, PageColumns, PageSection, PageStack } from "../components/page-layouts"
+import { stackDefinition } from "../component-registry"
 
 export const sectionBlock = createReactBlockSpec(
   {
@@ -12,6 +13,9 @@ export const sectionBlock = createReactBlockSpec(
       radius: { default: "none", values: ["none", "md", "lg"] as const },
       anchor: { default: "" },
       effect: { default: "none", values: ["none", "fade", "slide"] as const },
+      contentAlignment: { default: "left", values: ["left", "center", "right"] as const },
+      verticalAlignment: { default: "start", values: ["start", "center", "end"] as const },
+      minHeight: { default: "auto", values: ["auto", "large", "screen"] as const },
     },
     content: "none",
     layoutOnly: true,
@@ -47,6 +51,7 @@ export const columnsBlock = createReactBlockSpec(
       distribution: { default: "equal", values: ["equal", "sidebar-left", "sidebar-right"] as const },
       gap: { default: "md", values: ["sm", "md", "lg"] as const },
       mobile: { default: "stack", values: ["stack", "scroll"] as const },
+      align: { default: "stretch", values: ["start", "center", "end", "stretch"] as const },
     },
     content: "none",
     layoutOnly: true,
@@ -55,4 +60,12 @@ export const columnsBlock = createReactBlockSpec(
   {
     renderFrame: ({ block, slotRef }) => <PageColumns properties={block.props} editor><div ref={slotRef} /></PageColumns>,
   },
+)()
+
+export const stackBlock = createReactBlockSpec(
+  {
+    type: "stack", propSchema: stackDefinition.propSchema, content: "none",
+    layoutOnly: true, children: { allow: "blocks", exclude: ["section", "columns"] as const },
+  },
+  { renderFrame: ({ block, slotRef }) => <PageStack properties={block.props} editor><div ref={slotRef} /></PageStack> },
 )()

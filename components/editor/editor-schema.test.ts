@@ -21,14 +21,17 @@ describe("editor schema", () => {
         "video",
         "youtube",
         "pageCollection",
-        "hero",
+        "button",
         "featureGrid",
         "callToAction",
         "section",
         "columns",
         "column",
+        "stack",
       ]),
     )
+    expect(editorSchema.blockSchema).not.toHaveProperty("hero")
+    expect(editorSchema.blockSchema).not.toHaveProperty("heroLayout")
   })
 
   it("derives callout properties from the real schema", () => {

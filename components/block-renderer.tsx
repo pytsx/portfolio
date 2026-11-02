@@ -1,22 +1,21 @@
 import Link from "next/link"
 import Image from "next/image"
 import type { CSSProperties } from "react"
-import { ComposedHero } from "./editor/components/composed-hero"
 
 import {
   CallToActionSection,
   FeatureGridSection,
-  HeroSection,
   type CallToActionSectionProps,
   type FeatureGridSectionProps,
-  type HeroSectionProps,
 } from "@/components/editor/components/web-page-sections"
 import {
   PageColumn,
   PageColumns,
   PageSection,
+  PageStack,
   type PageColumnsProperties,
   type PageSectionProperties,
+  type PageStackProperties,
 } from "@/components/editor/components/page-layouts"
 import type { EditorDocument } from "@/components/editor/editor-types"
 import "./editor/editor.css"
@@ -143,20 +142,6 @@ function YouTubeBlock({ props }: { props: Record<string, unknown> }) {
   )
 }
 
-function asHeroProps(props: Record<string, unknown>): HeroSectionProps {
-  return {
-    eyebrow: typeof props.eyebrow === "string" ? props.eyebrow : "",
-    title: typeof props.title === "string" ? props.title : "",
-    description: typeof props.description === "string" ? props.description : "",
-    primaryLabel: typeof props.primaryLabel === "string" ? props.primaryLabel : "",
-    primaryHref: typeof props.primaryHref === "string" ? getSafeHref(props.primaryHref) ?? "#" : "#",
-    secondaryLabel: typeof props.secondaryLabel === "string" ? props.secondaryLabel : "",
-    secondaryHref: typeof props.secondaryHref === "string" ? getSafeHref(props.secondaryHref) ?? "#" : "#",
-    alignment: props.alignment === "center" ? "center" : "left",
-    appearance: props.appearance === "gradient" ? "gradient" : props.appearance === "muted" ? "muted" : "default",
-  }
-}
-
 function asFeatureGridProps(props: Record<string, unknown>): FeatureGridSectionProps {
   return {
     title: typeof props.title === "string" ? props.title : "",
@@ -188,6 +173,9 @@ function asSectionProperties(props: Record<string, unknown>): PageSectionPropert
     radius: props.radius === "md" || props.radius === "lg" ? props.radius : "none",
     anchor: typeof props.anchor === "string" ? props.anchor : "",
     effect: props.effect === "fade" || props.effect === "slide" ? props.effect : "none",
+    contentAlignment: props.contentAlignment === "center" || props.contentAlignment === "right" ? props.contentAlignment : "left",
+    verticalAlignment: props.verticalAlignment === "center" || props.verticalAlignment === "end" ? props.verticalAlignment : "start",
+    minHeight: props.minHeight === "large" || props.minHeight === "screen" ? props.minHeight : "auto",
   }
 }
 
@@ -196,6 +184,17 @@ function asColumnsProperties(props: Record<string, unknown>): PageColumnsPropert
     distribution: props.distribution === "sidebar-left" || props.distribution === "sidebar-right" ? props.distribution : "equal",
     gap: props.gap === "sm" || props.gap === "lg" ? props.gap : "md",
     mobile: props.mobile === "scroll" ? "scroll" : "stack",
+    align: props.align === "start" || props.align === "center" || props.align === "end" ? props.align : "stretch",
+  }
+}
+
+function asStackProperties(props: Record<string, unknown>): PageStackProperties {
+  return {
+    direction: props.direction === "row" ? "row" : "column",
+    gap: props.gap === "none" || props.gap === "sm" || props.gap === "lg" || props.gap === "xl" ? props.gap : "md",
+    justify: props.justify === "center" || props.justify === "end" || props.justify === "between" ? props.justify : "start",
+    align: props.align === "start" || props.align === "center" || props.align === "end" ? props.align : "stretch",
+    wrap: props.wrap !== false,
   }
 }
 
@@ -219,8 +218,6 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
   const blockKey = getBlockKey(sourceBlock, path)
 
   switch (block.type) {
-    case "heroLayout":
-      return <ComposedHero props={props}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></ComposedHero>
     case "button":
       return <a className="builder-button" data-variant={props.variant ?? "primary"} href={typeof props.href === "string" ? getSafeHref(props.href) : undefined}>{content}</a>
     case "heading": {
@@ -254,8 +251,6 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
       return <aside className="editor-callout" data-tone={typeof props.tone === "string" ? props.tone : "info"} role="note"><span className="editor-callout-icon">{typeof props.icon === "string" ? props.icon : "💡"}</span><div><InlineText content={block.content} /></div></aside>
     case "youtube":
       return <YouTubeBlock props={props} />
-    case "hero":
-      return <HeroSection {...asHeroProps(props)} />
     case "featureGrid":
       return <FeatureGridSection {...asFeatureGridProps(props)} />
     case "callToAction":
@@ -268,6 +263,8 @@ function BlockContent({ block: sourceBlock, collections, path }: BlockProps) {
       return <PageColumns properties={asColumnsProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumns>
     case "column":
       return <PageColumn><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageColumn>
+    case "stack":
+      return <PageStack properties={asStackProperties(props)}><BlockChildren collections={collections} path={path}>{block.children}</BlockChildren></PageStack>
     case "pageCollection":
       return <PageCollection items={collections[blockKey] ?? []} layout={props.layout === "list" ? "list" : "grid"} />
     default:

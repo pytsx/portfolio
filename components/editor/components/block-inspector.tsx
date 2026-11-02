@@ -1,8 +1,8 @@
 import { SlidersHorizontal } from "lucide-react"
 
 import { editorSchema } from "../editor-schema"
-import { propertyLabels, heroDefinition, heroPreset } from "../component-registry"
-import { migrateHero, duplicateWithoutIds } from "../lib/hero-migration"
+import { propertyLabels } from "../component-registry"
+import { duplicateWithoutIds } from "../lib/legacy-layout-migration"
 
 type EditorInstance = typeof editorSchema.BlockNoteEditor
 type SelectedBlock = ReturnType<EditorInstance["getBlock"]>
@@ -34,12 +34,10 @@ export function BlockInspector({ block, editor }: { block: SelectedBlock; editor
         <div><strong>Propriedades</strong><span>{block?.type ?? "Nenhum bloco selecionado"}</span></div>
       </header>
       <div className="flex flex-wrap gap-2 text-xs">
-        <button type="button" onClick={() => editor.insertBlocks([heroPreset()], block ?? editor.document[editor.document.length - 1], "after")}>+ {heroDefinition.title}</button>
         {block ? <>
           <button type="button" onClick={() => editor.moveBlocksUp(block.id)}>↑ Subir</button>
           <button type="button" onClick={() => editor.moveBlocksDown(block.id)}>↓ Descer</button>
           <button type="button" onClick={() => editor.insertBlocks([duplicateWithoutIds(block)], block.id, "after")}>Duplicar</button>
-          {block.type === "hero" ? <button type="button" onClick={() => editor.replaceBlocks([block.id], [migrateHero(block)])}>Converter em Hero editável</button> : null}
         </> : null}
       </div>
       <details>

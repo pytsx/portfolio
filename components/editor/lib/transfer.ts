@@ -1,4 +1,5 @@
 import type { EditorDocument } from "../editor-types"
+import { migrateLegacyEditorValue } from "./legacy-layout-migration"
 
 const IMPORTABLE_BLOCK_TYPES = [
   "paragraph",
@@ -18,14 +19,13 @@ const IMPORTABLE_BLOCK_TYPES = [
   "callout",
   "youtube",
   "pageCollection",
-  "hero",
-  "heroLayout",
   "button",
   "featureGrid",
   "callToAction",
   "section",
   "columns",
   "column",
+  "stack",
 ] as const
 
 export const editorDocumentJsonSchema = {
@@ -41,7 +41,7 @@ export const editorDocumentJsonSchema = {
       type: { enum: IMPORTABLE_BLOCK_TYPES },
       props: {
         type: "object",
-        description: "Propriedades do bloco. section controla width, surface, spacing, radius, anchor e effect; columns controla distribution, gap e mobile; heading usa level; callout usa icon e tone; pageCollection consulta páginas; hero, featureGrid e callToAction compõem seções web.",
+        description: "Propriedades do bloco. section controla largura, fundo, espaçamento e alinhamento; stack controla direção e distribuição; columns controla proporção e responsividade; heading usa level.",
       },
       content: {
         description: "Texto rico em array, por exemplo [{ type: 'text', text: 'Olá', styles: { bold: true } }]. Blocos youtube, divider e pageCollection não usam conteúdo.",
@@ -86,11 +86,12 @@ function isImportedDocument(value: unknown): value is EditorDocument {
 }
 
 export function parseImportedEditorDocument(value: unknown): EditorDocument {
-  if (!isImportedDocument(value)) {
+  const migrated = migrateLegacyEditorValue(value)
+  if (!isImportedDocument(migrated)) {
     throw new Error("O arquivo não contém uma lista válida de blocos do editor.")
   }
 
-  return value
+  return migrated
 }
 
 export function createEditorDocumentExport(document: EditorDocument) {
